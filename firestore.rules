@@ -1,0 +1,142 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global safety net: default-deny everything unless explicitly matched
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper primitives
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && (
+        request.auth.token.email == 'azfar.mazumder@gmail.com' ||
+        request.auth.token.email == 'info.globaleduexp@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidDestination(dest) {
+      return dest in [
+        'Malaysia',
+        'Europe (Germany / EU)',
+        'United Kingdom',
+        'East Asia (Japan / South Korea)',
+        'Canada / USA / Australia',
+        'Rest of the World',
+        'Undecided / Need Guidance'
+      ];
+    }
+
+    function isValidDegreeLevel(level) {
+      return level in [
+        'Diploma',
+        'Foundation',
+        'Undergraduate',
+        'Masters',
+        'Foundation / Pathway',
+        "Undergraduate (Bachelor's)",
+        "Postgraduate (Master's)",
+        'Doctoral (PhD / Research)',
+        'Language / Diploma'
+      ];
+    }
+
+    function isValidStatus(status) {
+      return status in ['pending', 'scheduled', 'completed', 'archived'];
+    }
+
+    function isValidConsultation(data) {
+      return data.keys().hasAll([
+        'fullName',
+        'email',
+        'phone',
+        'destination',
+        'degreeLevel',
+        'preferredDateTime',
+        'message',
+        'status',
+        'adminNotes',
+        'createdAt',
+        'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'fullName',
+        'email',
+        'phone',
+        'destination',
+        'degreeLevel',
+        'preferredDateTime',
+        'message',
+        'status',
+        'adminNotes',
+        'createdAt',
+        'updatedAt'
+      ]) &&
+      data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 100 &&
+      data.email is string && data.email.size() >= 5 && data.email.size() <= 120 &&
+      data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$') &&
+      data.phone is string && data.phone.size() >= 7 && data.phone.size() <= 30 &&
+      data.phone.matches('^\\+?[0-9\\s\\-()]{7,30}$') &&
+      data.destination is string && isValidDestination(data.destination) &&
+      data.degreeLevel is string && isValidDegreeLevel(data.degreeLevel) &&
+      data.preferredDateTime is string && data.preferredDateTime.size() >= 4 && data.preferredDateTime.size() <= 80 &&
+      data.message is string && data.message.size() <= 1500 &&
+      data.status is string && isValidStatus(data.status) &&
+      data.adminNotes is string && data.adminNotes.size() <= 1000 &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    // Connection check document used on app startup
+    match /test/connection {
+      allow get: if true;
+    }
+
+    // Admins collection: read-only for the verified owner/admin; no client writes
+    match /admins/{adminId} {
+      allow get: if isValidId(adminId) && (isAdmin() || (isVerifiedUser() && request.auth.uid == adminId));
+      allow list: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // Consultations collection: public lead submission (create only); admin-only read/update/delete
+    match /consultations/{consultationId} {
+      allow get: if isValidId(consultationId) && isAdmin();
+      allow list: if isAdmin();
+      allow create: if isValidId(consultationId) &&
+        isValidConsultation(incoming()) &&
+        incoming().status == 'pending' &&
+        incoming().adminNotes == '' &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow update: if isAdmin() &&
+        isValidId(consultationId) &&
+        isValidConsultation(incoming()) &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'adminNotes', 'updatedAt']);
+      allow delete: if isValidId(consultationId) && isAdmin();
+    }
+  }
+}
