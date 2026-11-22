@@ -3,9 +3,9 @@ import react from '@vitejs/plugin-react';
 import fs from 'fs';
 import path from 'path';
 import {defineConfig} from 'vite';
-
 export default defineConfig(() => {
   return {
+    base: '/GEE/',
     plugins: [
       react(),
       tailwindcss(),
