@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Footer } from './components/Footer';
+import { HeroFlightNetworkBackground } from './components/HeroFlightNetworkBackground';
 import { Navbar, PageId } from './components/Navbar';
 import { WhatsAppButton } from './components/WhatsAppButton';
 import { AboutPage } from './pages/AboutPage';
@@ -13,10 +14,11 @@ import { StoriesPage } from './pages/StoriesPage';
 
 const VALID_PAGES: PageId[] = [
   'home',
-  'services',
   'destinations',
-  'stories',
+  'services',
+  'partners',
   'about',
+  'stories',
   'contact',
   'admin',
 ];
@@ -43,6 +45,18 @@ export default function App() {
   }, []);
 
   const handleNavigate = (page: PageId) => {
+    if (page === 'partners') {
+      setCurrentPage('home');
+      window.location.hash = 'partners';
+      window.setTimeout(() => {
+        const el = document.getElementById('partners');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 60);
+      return;
+    }
+
     if (page !== 'destinations') {
       setDestinationPreselect('all');
     }
@@ -55,13 +69,16 @@ export default function App() {
     setDestinationPreselect(destId);
   };
 
+  const activeHomeView = currentPage === 'home' || currentPage === 'partners';
+
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
+    <div className="relative isolate flex min-h-screen flex-col bg-transparent text-slate-100">
+      <HeroFlightNetworkBackground />
       <Navbar currentPage={currentPage} onNavigate={handleNavigate} />
 
-      <main className="flex-1">
+      <main className="flex-1 bg-transparent">
         <ErrorBoundary onReset={() => handleNavigate('home')}>
-          {currentPage === 'home' && (
+          {activeHomeView && (
             <HomePage
               onNavigate={handleNavigate}
               onSelectDestination={handleSelectDestination}

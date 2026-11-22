@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
+import { AnimatedCounter } from '../components/AnimatedCounter';
 import { PageId } from '../components/Navbar';
-import { STUDENT_STORIES } from '../data/consultancyData';
+import { ResilientImage } from '../components/ResilientImage';
+import { ScrollReveal } from '../components/ScrollReveal';
+import { PHOTO_FALLBACK_SRC, STUDENT_STORIES } from '../data/consultancyData';
 
 interface StoriesPageProps {
   onNavigate: (page: PageId) => void;
@@ -29,23 +32,50 @@ export function StoriesPage({ onNavigate }: StoriesPageProps) {
       : STUDENT_STORIES.filter((s) => s.destinationId === regionFilter);
 
   return (
-    <div className="bg-slate-50">
-      <section className="border-b border-slate-200 bg-white">
+    <div className="bg-transparent text-white">
+      <section className="border-b border-white/10 bg-transparent">
         <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-          <p className="text-xs font-semibold tracking-wide text-[#92400E]">
+          <p className="text-xs font-semibold tracking-wide text-cyan-300">
             Student Success Stories
           </p>
-          <h1 className="mt-2 max-w-3xl font-display text-3xl font-bold tracking-tight text-[#0F213E] [text-wrap:balance] sm:text-4xl">
+          <h1 className="mt-2 max-w-3xl font-display text-3xl font-bold tracking-tight text-white [text-wrap:balance] sm:text-4xl">
             Verified admissions, Erasmus Mundus awards, and international placements.
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-600">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-300">
             Read verified alumni reviews from students placed by Global Education Expert across Europe, the United States, the United Kingdom, and international medical universities.
           </p>
+
+          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <div className="rounded-xl border border-white/10 bg-[#0B1120]/60 px-5 py-4 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 hover:bg-white/10">
+              <p className="font-display text-2xl font-bold text-white tabular-nums">
+                <AnimatedCounter value="500+" immediate />
+              </p>
+              <p className="mt-1 text-xs font-medium text-slate-300">
+                Students Placed Globally
+              </p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-[#0B1120]/60 px-5 py-4 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 hover:bg-white/10">
+              <p className="font-display text-2xl font-bold text-cyan-300 tabular-nums">
+                <AnimatedCounter value="98%" immediate />
+              </p>
+              <p className="mt-1 text-xs font-medium text-slate-300">
+                Visa Success Rate
+              </p>
+            </div>
+            <div className="col-span-2 rounded-xl border border-white/10 bg-[#0B1120]/60 px-5 py-4 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 hover:bg-white/10 sm:col-span-1">
+              <p className="font-display text-2xl font-bold text-amber-300 tabular-nums">
+                <AnimatedCounter value={STUDENT_STORIES.length} immediate />
+              </p>
+              <p className="mt-1 text-xs font-medium text-slate-300">
+                Featured Alumni Reviews
+              </p>
+            </div>
+          </div>
 
           <div
             role="group"
             aria-label="Filter stories by destination"
-            className="mt-8 inline-flex flex-wrap items-center gap-1 rounded-lg bg-slate-100 p-1"
+            className="mt-8 inline-flex flex-wrap items-center gap-1 rounded-lg border border-white/10 bg-[#0B1120]/60 p-1 backdrop-blur-xl"
           >
             {STORY_FILTERS.map((tab) => {
               const active = regionFilter === tab.id;
@@ -54,10 +84,10 @@ export function StoriesPage({ onNavigate }: StoriesPageProps) {
                   key={tab.id}
                   type="button"
                   onClick={() => setRegionFilter(tab.id)}
-                  className={`min-h-[40px] rounded-md px-3.5 py-2 text-xs font-semibold transition-colors whitespace-nowrap shrink-0 ${
+                  className={`min-h-[40px] rounded-md px-3.5 py-2 text-xs font-semibold transition-all whitespace-nowrap shrink-0 ${
                     active
-                      ? 'bg-white text-[#0F213E] shadow-sm'
-                      : 'text-slate-600 hover:text-[#0F213E]'
+                      ? 'bg-gradient-to-r from-[#4F46E5] to-[#06B6D4] text-white shadow-sm'
+                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
                   }`}
                 >
                   {tab.label}
@@ -68,64 +98,79 @@ export function StoriesPage({ onNavigate }: StoriesPageProps) {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl bg-transparent px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {stories.map((story) => (
-            <article
-              key={story.id}
-              className="flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-6"
-            >
-              <div>
-                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                  <span className="font-semibold text-[#92400E]">
-                    {story.destinationLabel}
-                  </span>
-                  <span aria-hidden="true">·</span>
-                  <span>{story.degreeLevel}</span>
-                  <span aria-hidden="true">·</span>
-                  <span className="tabular-nums">{story.intakeYear}</span>
+          {stories.map((story, idx) => (
+            <ScrollReveal key={story.id} staggerIndex={idx % 3} className="h-full">
+              <article className="group flex h-full flex-col justify-between overflow-hidden rounded-xl border border-white/10 bg-[#0B1120]/60 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 hover:bg-white/10">
+                <div>
+                  <div className="relative aspect-[16/10] w-full overflow-hidden">
+                    <ResilientImage
+                      src={story.portraitImage}
+                      alt={story.portraitAlt}
+                      fallbackSrc={PHOTO_FALLBACK_SRC}
+                      fallbackTitle={story.studentName}
+                      className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div
+                      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0B1120] via-[#0B1120]/40 to-transparent"
+                      aria-hidden="true"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 p-4">
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                        <span className="font-semibold text-cyan-300">
+                          {story.destinationLabel}
+                        </span>
+                        <span aria-hidden="true">·</span>
+                        <span>{story.degreeLevel}</span>
+                      </div>
+                      <p className="mt-1 font-display text-sm font-semibold text-amber-300">
+                        {story.outcomeMetric}
+                      </p>
+                    </div>
+                  </div>
+
+                  <blockquote className="px-6 pt-4 text-sm leading-relaxed text-slate-200">
+                    “{story.quote}”
+                  </blockquote>
                 </div>
 
-                <p className="mt-3 font-display text-sm font-semibold text-[#0F213E]">
-                  {story.outcomeMetric}
-                </p>
-
-                <blockquote className="mt-3 text-sm leading-relaxed text-slate-700">
-                  “{story.quote}”
-                </blockquote>
-              </div>
-
-              <div className="mt-6 border-t border-slate-100 pt-4">
-                <p className="font-display text-base font-semibold text-[#0F213E]">
-                  {story.studentName}
-                </p>
-                <p className="mt-0.5 text-xs text-slate-600">
-                  Origin: {story.originCountry} · Admitted to {story.university}
-                </p>
-                <p className="mt-0.5 text-xs text-slate-500">{story.program}</p>
-              </div>
-            </article>
+                <div className="mt-6 border-t border-white/10 px-6 py-4">
+                  <p className="font-display text-base font-semibold text-white">
+                    {story.studentName}
+                  </p>
+                  <p className="mt-0.5 text-xs text-slate-300">
+                    Origin: {story.originCountry} · Admitted to {story.university}
+                  </p>
+                  <p className="mt-0.5 text-xs text-slate-400">
+                    {story.program} · {story.intakeYear}
+                  </p>
+                </div>
+              </article>
+            </ScrollReveal>
           ))}
         </div>
 
-        <div className="mt-14 rounded-xl bg-[#0F213E] px-8 py-10 text-white sm:flex sm:items-center sm:justify-between">
-          <div>
-            <h2 className="font-display text-2xl font-bold text-white">
-              Start building your own admission case
-            </h2>
-            <p className="mt-2 max-w-xl text-sm text-slate-300">
-              Share your target degree and preferred country in a free 30-minute consultation session.
-            </p>
+        <ScrollReveal>
+          <div className="mt-14 rounded-xl border border-white/10 bg-[#0B1120]/60 px-8 py-10 text-white backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <h2 className="font-display text-2xl font-bold text-white">
+                Start building your own admission case
+              </h2>
+              <p className="mt-2 max-w-xl text-sm text-slate-300">
+                Share your target degree and preferred country in a free 30-minute consultation session.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => onNavigate('contact')}
+              className="mt-6 inline-flex min-h-[44px] items-center gap-2 rounded-lg bg-gradient-to-r from-[#4F46E5] to-[#06B6D4] px-6 py-3 text-sm font-semibold text-white shadow-[0_0_16px_rgba(79,70,229,0.35)] transition-all hover:shadow-[0_0_24px_rgba(6,182,212,0.55)] whitespace-nowrap shrink-0 sm:mt-0"
+            >
+              <span>Book Free Consultation</span>
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => onNavigate('contact')}
-            className="mt-6 inline-flex min-h-[44px] items-center gap-2 rounded-lg bg-amber-500 px-6 py-3 text-sm font-semibold text-slate-950 transition-colors hover:bg-amber-400 whitespace-nowrap shrink-0 sm:mt-0"
-          >
-            <span>Book Free Consultation</span>
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </button>
-        </div>
+        </ScrollReveal>
       </section>
     </div>
   );

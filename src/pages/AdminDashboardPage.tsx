@@ -7,6 +7,7 @@ import {
   Search,
   Trash2,
 } from 'lucide-react';
+import { AnimatedCounter } from '../components/AnimatedCounter';
 import {
   ConsultationRecord,
   deleteConsultationRecord,
@@ -161,11 +162,11 @@ export function AdminDashboardPage() {
     const headers = [
       'Reference ID',
       'Full Name',
-      'Email',
-      'Phone',
-      'Destination',
-      'Degree Level',
-      'Preferred Date/Time',
+      'Email Address',
+      'Phone / WhatsApp Number',
+      'Preferred Study Destination',
+      'Desired Degree Level',
+      'Preferred Date & Time',
       'Status',
       'Message',
       'Admin Notes',
@@ -202,7 +203,7 @@ export function AdminDashboardPage() {
 
   if (!authReady) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-20 text-center text-sm text-slate-600">
+      <div className="mx-auto max-w-4xl px-4 py-20 text-center text-sm text-slate-300">
         Verifying counselor session...
       </div>
     );
@@ -211,19 +212,19 @@ export function AdminDashboardPage() {
   if (!user) {
     return (
       <div className="mx-auto max-w-lg px-4 py-20">
-        <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-[#0F213E]">
+        <div className="rounded-xl border border-white/10 bg-[#0B1120]/60 p-8 text-center backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg border border-cyan-400/30 bg-cyan-400/15 text-cyan-300">
             <Lock className="h-5 w-5" aria-hidden="true" />
           </div>
-          <h1 className="mt-4 font-display text-2xl font-bold text-[#0F213E]">
+          <h1 className="mt-4 font-display text-2xl font-bold text-white">
             Consultant Admin Portal
           </h1>
-          <p className="mt-2 text-sm leading-relaxed text-slate-600">
+          <p className="mt-2 text-sm leading-relaxed text-slate-300">
             Sign in with your authorized Global Education Expert Google account to review student consultation bookings, update scheduling statuses, and export inquiries.
           </p>
 
           {authError && (
-            <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800">
+            <p className="mt-4 rounded-lg border border-red-400/30 bg-red-500/15 px-3 py-2 text-xs text-red-200">
               {authError}
             </p>
           )}
@@ -231,7 +232,7 @@ export function AdminDashboardPage() {
           <button
             type="button"
             onClick={handleGoogleSignIn}
-            className="mt-6 inline-flex min-h-[44px] w-full items-center justify-center rounded-lg bg-[#0F213E] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#19335D]"
+            className="mt-6 inline-flex min-h-[44px] w-full items-center justify-center rounded-lg bg-gradient-to-r from-[#4F46E5] to-[#06B6D4] px-5 py-3 text-sm font-semibold text-white transition-all hover:shadow-[0_0_24px_rgba(6,182,212,0.5)]"
           >
             Sign in with Google
           </button>
@@ -243,17 +244,17 @@ export function AdminDashboardPage() {
   if (!isAuthorizedAdmin) {
     return (
       <div className="mx-auto max-w-lg px-4 py-20">
-        <div className="rounded-xl border border-amber-200 bg-white p-8 text-center">
-          <h1 className="font-display text-xl font-bold text-[#0F213E]">
+        <div className="rounded-xl border border-amber-400/30 bg-[#0B1120]/60 p-8 text-center backdrop-blur-xl">
+          <h1 className="font-display text-xl font-bold text-white">
             Restricted Counselor Access
           </h1>
-          <p className="mt-2 text-sm text-slate-600">
-            Signed in as <span className="font-medium text-slate-900">{user.email}</span>. Consultation booking records are restricted to verified consultancy administrators.
+          <p className="mt-2 text-sm text-slate-300">
+            Signed in as <span className="font-medium text-white">{user.email}</span>. Consultation booking records are restricted to verified consultancy administrators.
           </p>
           <button
             type="button"
             onClick={handleSignOut}
-            className="mt-6 inline-flex min-h-[44px] items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+            className="mt-6 inline-flex min-h-[44px] items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/10"
           >
             <LogOut className="h-4 w-4" aria-hidden="true" />
             <span>Sign Out</span>
@@ -264,18 +265,18 @@ export function AdminDashboardPage() {
   }
 
   return (
-    <div className="bg-slate-50 py-10">
+    <div className="bg-transparent py-10 text-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header Bar */}
-        <div className="flex flex-col justify-between gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-center">
+        <div className="flex flex-col justify-between gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-center">
           <div>
-            <p className="text-xs font-semibold tracking-wide text-[#92400E]">
+            <p className="text-xs font-semibold tracking-wide text-cyan-300">
               Consultant Admin Portal
             </p>
-            <h1 className="mt-1 font-display text-2xl font-bold text-[#0F213E] sm:text-3xl">
+            <h1 className="mt-1 font-display text-2xl font-bold text-white sm:text-3xl">
               Consultation Bookings &amp; Student Inquiries
             </h1>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-slate-400">
               Signed in as {user.email}
             </p>
           </div>
@@ -284,7 +285,7 @@ export function AdminDashboardPage() {
               type="button"
               onClick={handleExportCsv}
               disabled={filteredRecords.length === 0}
-              className="inline-flex min-h-[40px] items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-[#0F213E] hover:bg-slate-50 disabled:opacity-50 whitespace-nowrap shrink-0"
+              className="inline-flex min-h-[40px] items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold text-white backdrop-blur-md hover:border-cyan-400/50 hover:bg-white/10 disabled:opacity-50 whitespace-nowrap shrink-0"
             >
               <Download className="h-4 w-4" aria-hidden="true" />
               <span>Download CSV</span>
@@ -292,7 +293,7 @@ export function AdminDashboardPage() {
             <button
               type="button"
               onClick={handleSignOut}
-              className="inline-flex min-h-[40px] items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 whitespace-nowrap shrink-0"
+              className="inline-flex min-h-[40px] items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold text-slate-200 backdrop-blur-md hover:border-cyan-400/50 hover:bg-white/10 whitespace-nowrap shrink-0"
             >
               <LogOut className="h-4 w-4" aria-hidden="true" />
               <span>Sign Out</span>
@@ -301,29 +302,29 @@ export function AdminDashboardPage() {
         </div>
 
         {/* KPI Summary Strip */}
-        <div className="mt-6 grid grid-cols-2 divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white sm:grid-cols-4 sm:divide-x sm:divide-y-0">
+        <div className="mt-6 grid grid-cols-2 divide-y divide-white/10 rounded-xl border border-white/10 bg-[#0B1120]/60 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 sm:grid-cols-4 sm:divide-x sm:divide-y-0">
           <div className="px-5 py-4">
-            <p className="text-xs font-medium text-slate-500">Total Inquiries</p>
-            <p className="mt-1 font-display text-2xl font-bold text-[#0F213E] tabular-nums">
-              {counts.total}
+            <p className="text-xs font-medium text-slate-400">Total Inquiries</p>
+            <p className="mt-1 font-display text-2xl font-bold text-white tabular-nums">
+              <AnimatedCounter value={counts.total} immediate />
             </p>
           </div>
           <div className="px-5 py-4">
-            <p className="text-xs font-medium text-slate-500">Pending Review</p>
-            <p className="mt-1 font-display text-2xl font-bold text-[#B45309] tabular-nums">
-              {counts.pending}
+            <p className="text-xs font-medium text-slate-400">Pending Review</p>
+            <p className="mt-1 font-display text-2xl font-bold text-amber-300 tabular-nums">
+              <AnimatedCounter value={counts.pending} immediate />
             </p>
           </div>
           <div className="px-5 py-4">
-            <p className="text-xs font-medium text-slate-500">Scheduled</p>
-            <p className="mt-1 font-display text-2xl font-bold text-[#0F213E] tabular-nums">
-              {counts.scheduled}
+            <p className="text-xs font-medium text-slate-400">Scheduled</p>
+            <p className="mt-1 font-display text-2xl font-bold text-cyan-300 tabular-nums">
+              <AnimatedCounter value={counts.scheduled} immediate />
             </p>
           </div>
           <div className="px-5 py-4">
-            <p className="text-xs font-medium text-slate-500">Completed</p>
-            <p className="mt-1 font-display text-2xl font-bold text-emerald-700 tabular-nums">
-              {counts.completed}
+            <p className="text-xs font-medium text-slate-400">Completed</p>
+            <p className="mt-1 font-display text-2xl font-bold text-emerald-300 tabular-nums">
+              <AnimatedCounter value={counts.completed} immediate />
             </p>
           </div>
         </div>
@@ -333,7 +334,7 @@ export function AdminDashboardPage() {
           <div
             role="group"
             aria-label="Filter bookings by status"
-            className="flex flex-wrap items-center gap-1 rounded-lg bg-slate-200/70 p-1"
+            className="flex flex-wrap items-center gap-1 rounded-lg border border-white/10 bg-[#0B1120]/60 p-1 backdrop-blur-xl"
           >
             {(['all', ...CONSULTATION_STATUSES] as const).map((status) => {
               const active = statusFilter === status;
@@ -342,10 +343,10 @@ export function AdminDashboardPage() {
                   key={status}
                   type="button"
                   onClick={() => setStatusFilter(status)}
-                  className={`min-h-[38px] rounded-md px-3 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap shrink-0 ${
+                  className={`min-h-[38px] rounded-md px-3 py-1.5 text-xs font-semibold transition-all whitespace-nowrap shrink-0 ${
                     active
-                      ? 'bg-white text-[#0F213E] shadow-sm'
-                      : 'text-slate-600 hover:text-[#0F213E]'
+                      ? 'bg-gradient-to-r from-[#4F46E5] to-[#06B6D4] text-white shadow-sm'
+                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
                   }`}
                 >
                   {status === 'all' ? 'All Bookings' : STATUS_LABELS[status]}
@@ -365,32 +366,32 @@ export function AdminDashboardPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search name, email, destination..."
               aria-label="Search consultation bookings"
-              className="min-h-[40px] w-full rounded-lg border border-slate-300 bg-white py-2 pr-3 pl-9 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#0F213E] focus:outline-none"
+              className="min-h-[40px] w-full rounded-lg border border-white/15 bg-[#0B1120]/80 py-2 pr-3 pl-9 text-sm text-white placeholder:text-slate-400 focus:border-cyan-400 focus:outline-none"
             />
           </div>
         </div>
 
         {dataError && (
-          <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          <div className="mt-6 rounded-lg border border-red-400/30 bg-red-500/15 px-4 py-3 text-sm text-red-200">
             {dataError}
           </div>
         )}
 
         {/* Split Table + Inspector */}
         <div className="mt-6 grid gap-6 lg:grid-cols-12">
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white lg:col-span-7">
+          <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0B1120]/60 backdrop-blur-xl lg:col-span-7">
             {loadingRecords ? (
-              <div className="p-10 text-center text-sm text-slate-500">
+              <div className="p-10 text-center text-sm text-slate-400">
                 Loading consultation records...
               </div>
             ) : filteredRecords.length === 0 ? (
-              <div className="p-10 text-center text-sm text-slate-500">
+              <div className="p-10 text-center text-sm text-slate-400">
                 No consultation bookings match your current filter.
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-600">
+                  <thead className="border-b border-white/10 bg-white/[0.06] text-xs font-semibold text-cyan-200">
                     <tr>
                       <th className="px-4 py-3">Student</th>
                       <th className="px-4 py-3">Destination</th>
@@ -398,7 +399,7 @@ export function AdminDashboardPage() {
                       <th className="px-4 py-3 text-right">Submitted</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-white/10">
                     {filteredRecords.map((rec) => {
                       const isSelected = rec.id === selectedId;
                       return (
@@ -406,23 +407,23 @@ export function AdminDashboardPage() {
                           key={rec.id}
                           onClick={() => handleSelectRecord(rec)}
                           className={`cursor-pointer transition-colors ${
-                            isSelected ? 'bg-slate-100' : 'hover:bg-slate-50'
+                            isSelected ? 'bg-white/10' : 'hover:bg-white/[0.05]'
                           }`}
                         >
                           <td className="px-4 py-3">
-                            <p className="font-semibold text-[#0F213E]">
+                            <p className="font-semibold text-white">
                               {rec.fullName}
                             </p>
-                            <p className="text-xs text-slate-500">{rec.email}</p>
+                            <p className="text-xs text-slate-400">{rec.email}</p>
                           </td>
-                          <td className="px-4 py-3 text-xs text-slate-700">
+                          <td className="px-4 py-3 text-xs text-slate-200">
                             <p className="font-medium">{rec.destination}</p>
-                            <p className="text-slate-500">{rec.degreeLevel}</p>
+                            <p className="text-slate-400">{rec.degreeLevel}</p>
                           </td>
-                          <td className="px-4 py-3 text-xs font-medium text-slate-700">
+                          <td className="px-4 py-3 text-xs font-medium text-cyan-200">
                             {STATUS_LABELS[rec.status]}
                           </td>
-                          <td className="px-4 py-3 text-right font-mono text-xs text-slate-500 tabular-nums whitespace-nowrap">
+                          <td className="px-4 py-3 text-right font-mono text-xs text-slate-400 tabular-nums whitespace-nowrap">
                             {rec.createdAt
                               ? rec.createdAt.toLocaleDateString()
                               : 'Pending'}
@@ -436,15 +437,15 @@ export function AdminDashboardPage() {
             )}
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-5">
+          <div className="rounded-xl border border-white/10 bg-[#0B1120]/60 p-6 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 lg:col-span-5">
             {selectedRecord ? (
               <div>
-                <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
+                <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-4">
                   <div>
                     <p className="font-mono text-xs text-slate-400">
                       Ref: {selectedRecord.id}
                     </p>
-                    <h2 className="mt-1 font-display text-lg font-bold text-[#0F213E]">
+                    <h2 className="mt-1 font-display text-lg font-bold text-white">
                       {selectedRecord.fullName}
                     </h2>
                   </div>
@@ -452,7 +453,7 @@ export function AdminDashboardPage() {
                     type="button"
                     onClick={() => handleDelete(selectedRecord.id)}
                     aria-label="Delete consultation booking"
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 text-slate-400 transition-colors hover:border-red-400/40 hover:bg-red-500/15 hover:text-red-300"
                     title="Delete booking"
                   >
                     <Trash2 className="h-4 w-4" aria-hidden="true" />
@@ -461,42 +462,44 @@ export function AdminDashboardPage() {
 
                 <dl className="mt-4 space-y-3 text-sm">
                   <div>
-                    <dt className="text-xs font-medium text-slate-500">Email &amp; Phone</dt>
-                    <dd className="mt-0.5 text-slate-800">
+                    <dt className="text-xs font-medium text-slate-400">
+                      Email Address &amp; Phone / WhatsApp Number
+                    </dt>
+                    <dd className="mt-0.5 text-slate-200">
                       {selectedRecord.email} · {selectedRecord.phone}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-xs font-medium text-slate-500">
-                      Target Pathway
+                    <dt className="text-xs font-medium text-slate-400">
+                      Preferred Study Destination &amp; Desired Degree Level
                     </dt>
-                    <dd className="mt-0.5 text-slate-800">
+                    <dd className="mt-0.5 text-slate-200">
                       {selectedRecord.destination} · {selectedRecord.degreeLevel}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-xs font-medium text-slate-500">
-                      Requested Date &amp; Time
+                    <dt className="text-xs font-medium text-slate-400">
+                      Preferred Date &amp; Time
                     </dt>
-                    <dd className="mt-0.5 text-slate-800">
+                    <dd className="mt-0.5 font-mono text-cyan-200 tabular-nums">
                       {selectedRecord.preferredDateTime}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-xs font-medium text-slate-500">
+                    <dt className="text-xs font-medium text-slate-400">
                       Student Message
                     </dt>
-                    <dd className="mt-1 rounded-lg bg-slate-50 p-3 text-xs leading-relaxed text-slate-700">
+                    <dd className="mt-1 rounded-lg border border-white/10 bg-[#0B1120]/70 p-3 text-xs leading-relaxed text-slate-200">
                       {selectedRecord.message || 'No additional notes provided.'}
                     </dd>
                   </div>
                 </dl>
 
-                <div className="mt-5 space-y-4 border-t border-slate-100 pt-4">
+                <div className="mt-5 space-y-4 border-t border-white/10 pt-4">
                   <div>
                     <label
                       htmlFor="admin-status"
-                      className="block text-xs font-semibold text-slate-700"
+                      className="block text-xs font-semibold text-slate-200"
                     >
                       Counseling Status
                     </label>
@@ -506,10 +509,10 @@ export function AdminDashboardPage() {
                       onChange={(e) =>
                         setDraftStatus(e.target.value as ConsultationStatus)
                       }
-                      className="mt-1.5 min-h-[40px] w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-[#0F213E] focus:outline-none"
+                      className="mt-1.5 min-h-[40px] w-full rounded-lg border border-white/15 bg-[#0B1120] px-3 py-2 text-sm text-white focus:border-cyan-400 focus:outline-none"
                     >
                       {CONSULTATION_STATUSES.map((st) => (
-                        <option key={st} value={st}>
+                        <option key={st} value={st} className="bg-[#0B1120] text-white">
                           {STATUS_LABELS[st]}
                         </option>
                       ))}
@@ -519,7 +522,7 @@ export function AdminDashboardPage() {
                   <div>
                     <label
                       htmlFor="admin-notes"
-                      className="block text-xs font-semibold text-slate-700"
+                      className="block text-xs font-semibold text-slate-200"
                     >
                       Counselor Notes
                     </label>
@@ -530,19 +533,19 @@ export function AdminDashboardPage() {
                       value={draftNotes}
                       onChange={(e) => setDraftNotes(e.target.value)}
                       placeholder="Record meeting link, shortlisted universities, or follow-up tasks..."
-                      className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-[#0F213E] focus:outline-none"
+                      className="mt-1.5 w-full rounded-lg border border-white/15 bg-[#0B1120]/80 px-3 py-2 text-sm text-white placeholder:text-slate-400 focus:border-cyan-400 focus:outline-none"
                     />
                   </div>
 
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs font-medium text-slate-600">
+                    <span className="text-xs font-medium text-cyan-300">
                       {saveFeedback ?? ''}
                     </span>
                     <button
                       type="button"
                       onClick={handleSaveChanges}
                       disabled={savingUpdate}
-                      className="min-h-[40px] rounded-lg bg-[#0F213E] px-5 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#19335D] disabled:opacity-60"
+                      className="min-h-[40px] rounded-lg bg-gradient-to-r from-[#4F46E5] to-[#06B6D4] px-5 py-2 text-xs font-semibold text-white transition-all hover:shadow-[0_0_20px_rgba(6,182,212,0.45)] disabled:opacity-60"
                     >
                       {savingUpdate ? 'Saving...' : 'Save Changes'}
                     </button>
@@ -550,7 +553,7 @@ export function AdminDashboardPage() {
                 </div>
               </div>
             ) : (
-              <div className="py-16 text-center text-sm text-slate-500">
+              <div className="py-16 text-center text-sm text-slate-400">
                 Select a consultation record from the table to inspect student details, update its status, or add counselor notes.
               </div>
             )}
