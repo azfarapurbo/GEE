@@ -1,5 +1,6 @@
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { AnimatedCounter } from '../components/AnimatedCounter';
+import { FounderExecutiveSection } from '../components/FounderExecutiveSection';
 import { PageId } from '../components/Navbar';
 import { ResilientImage } from '../components/ResilientImage';
 import { ScrollReveal } from '../components/ScrollReveal';
@@ -124,6 +125,9 @@ export function AboutPage({ onNavigate }: AboutPageProps) {
           </div>
         </div>
       </section>
+
+      {/* Meet Our Founder & Owner Executive Profile */}
+      <FounderExecutiveSection />
 
       {/* Why Students Trust Us */}
       <section className="mx-auto max-w-7xl bg-transparent px-4 py-14 sm:px-6 lg:px-8">
