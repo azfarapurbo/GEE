@@ -1,16 +1,18 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
-import { ArrowRight, Check, Search } from 'lucide-react';
+import { ArrowRight, Building2, Check, Search } from 'lucide-react';
 import { AnimatedCounter } from '../components/AnimatedCounter';
 import { PageId } from '../components/Navbar';
 import { ResilientImage } from '../components/ResilientImage';
 import { ScrollReveal } from '../components/ScrollReveal';
 import {
+  ALL_WEBSITE_UNIVERSITIES_GROUPS,
   EUROPE_COUNTRIES_UNIVERSITIES,
-  GLOBAL_PARTNER_GROUPS,
   PHOTO_FALLBACK_SRC,
   REST_OF_WORLD_PATHS,
   REST_OF_WORLD_SERVICES,
   STUDY_DESTINATIONS,
+  TOTAL_ENLISTED_UNIVERSITIES,
+  UniversityNetworkRegionId,
 } from '../data/consultancyData';
 import {
   DESTINATION_DIRECTORIES,
@@ -94,6 +96,11 @@ export function DestinationsPage({
   const [flagshipRegion, setFlagshipRegion] =
     useState<DestinationRegionId>(initialRegion);
   const [flagshipSearch, setFlagshipSearch] = useState('');
+  const [globalNetworkRegion, setGlobalNetworkRegion] = useState<
+    'all' | UniversityNetworkRegionId
+  >('all');
+  const [globalNetworkSearch, setGlobalNetworkSearch] = useState('');
+  const [expandGlobalNetwork, setExpandGlobalNetwork] = useState(false);
 
   useEffect(() => {
     setFlagshipRegion(selectedRegion);
@@ -132,6 +139,33 @@ export function DestinationsPage({
         }))
     );
   }, [flagshipRegion, flagshipSearch]);
+
+  const filteredGlobalNetworkGroups = useMemo(() => {
+    const q = globalNetworkSearch.trim().toLowerCase();
+    return ALL_WEBSITE_UNIVERSITIES_GROUPS.filter(
+      (grp) => globalNetworkRegion === 'all' || grp.id === globalNetworkRegion
+    )
+      .map((grp) => ({
+        ...grp,
+        universities: q
+          ? grp.universities.filter(
+              (u) =>
+                u.name.toLowerCase().includes(q) ||
+                u.location.toLowerCase().includes(q)
+            )
+          : grp.universities,
+      }))
+      .filter((grp) => grp.universities.length > 0);
+  }, [globalNetworkRegion, globalNetworkSearch]);
+
+  const visibleGlobalNetworkCount = useMemo(
+    () =>
+      filteredGlobalNetworkGroups.reduce(
+        (sum, grp) => sum + grp.universities.length,
+        0
+      ),
+    [filteredGlobalNetworkGroups]
+  );
 
   const filteredDestinations = STUDY_DESTINATIONS.filter((dest) => {
     const matchesRegion = selectedRegion === 'all' || dest.id === selectedRegion;
@@ -932,35 +966,141 @@ export function DestinationsPage({
             </div>
 
             <div className="mt-8">
-              <h3 className="font-display text-lg font-bold text-white">
-                <AnimatedCounter value={25} /> Global Partner Universities &amp; Institutions
-              </h3>
-              <p className="mt-1 text-sm text-slate-300">
-                Direct partner admissions across Canada, USA, Australia, New Zealand, Europe, and Malaysia.
-              </p>
+              <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+                <div>
+                  <h3 className="font-display text-lg font-bold text-white">
+                    <AnimatedCounter value={TOTAL_ENLISTED_UNIVERSITIES} /> Complete Website University Roster &amp; Global Partner Network
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-300">
+                    All universities listed across Canada, USA, United Kingdom, Europe, Australia &amp; New Zealand, Malaysia, and East Asia / Global pathways.
+                  </p>
+                </div>
 
-              <div className="mt-5 grid gap-6 md:grid-cols-2">
-                {GLOBAL_PARTNER_GROUPS.map((group) => (
-                  <div
-                    key={group.region}
-                    className="rounded-lg border border-white/10 bg-white/5 p-5 backdrop-blur-md transition-all duration-300 hover:border-cyan-400/50 hover:bg-white/10"
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="font-mono text-xs text-slate-300 tabular-nums">
+                    Showing {visibleGlobalNetworkCount} of{' '}
+                    {TOTAL_ENLISTED_UNIVERSITIES} universities
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setExpandGlobalNetwork((prev) => !prev)}
+                    className="min-h-[38px] rounded-lg border border-cyan-400/35 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-cyan-200 transition-colors hover:border-cyan-400/70 hover:bg-white/10 whitespace-nowrap shrink-0"
                   >
-                    <h4 className="font-display text-base font-semibold text-white">
-                      {group.region}
-                    </h4>
-                    <ul className="mt-3 space-y-2 text-sm text-slate-200">
-                      {group.universities.map((uni) => (
-                        <li key={uni} className="flex items-start gap-2">
-                          <Check
-                            className="mt-0.5 h-4 w-4 shrink-0 text-amber-300"
-                            aria-hidden="true"
-                          />
-                          <span>{uni}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+                    {expandGlobalNetwork
+                      ? 'Compact Scroll View'
+                      : 'Expand All Universities'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Search & Region Filters */}
+              <div className="mt-5 flex flex-col gap-3">
+                <div className="relative w-full lg:max-w-md">
+                  <Search
+                    className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400"
+                    aria-hidden="true"
+                  />
+                  <input
+                    type="search"
+                    value={globalNetworkSearch}
+                    onChange={(e) => setGlobalNetworkSearch(e.target.value)}
+                    placeholder={`Search all ${TOTAL_ENLISTED_UNIVERSITIES} universities by name or country...`}
+                    aria-label="Search extended partner network universities"
+                    className="min-h-[42px] w-full rounded-lg border border-white/15 bg-[#0B1120]/80 py-2 pr-3 pl-9 text-sm text-white placeholder:text-slate-400 focus:border-cyan-400 focus:outline-none"
+                  />
+                </div>
+
+                <div
+                  role="group"
+                  aria-label="Filter extended global university network by region"
+                  className="flex flex-wrap items-center gap-1 rounded-lg border border-white/10 bg-[#0B1120]/70 p-1"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setGlobalNetworkRegion('all')}
+                    className={`min-h-[36px] rounded-md px-3 py-1.5 text-xs font-semibold transition-all whitespace-nowrap shrink-0 tabular-nums ${
+                      globalNetworkRegion === 'all'
+                        ? 'bg-gradient-to-r from-[#4F46E5] to-[#06B6D4] text-white shadow-sm'
+                        : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    All Regions ({TOTAL_ENLISTED_UNIVERSITIES})
+                  </button>
+                  {ALL_WEBSITE_UNIVERSITIES_GROUPS.map((grp) => {
+                    const active = globalNetworkRegion === grp.id;
+                    return (
+                      <button
+                        key={`dest-net-${grp.id}`}
+                        type="button"
+                        onClick={() => setGlobalNetworkRegion(grp.id)}
+                        className={`min-h-[36px] rounded-md px-3 py-1.5 text-xs font-semibold transition-all whitespace-nowrap shrink-0 tabular-nums ${
+                          active
+                            ? 'bg-gradient-to-r from-[#4F46E5] to-[#06B6D4] text-white shadow-sm'
+                            : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                        }`}
+                      >
+                        {grp.regionLabel} ({grp.universities.length})
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Complete Enlisted University Grid */}
+              <div
+                className={`mt-6 space-y-8 ${
+                  expandGlobalNetwork
+                    ? ''
+                    : 'max-h-[600px] overflow-y-auto pr-2'
+                }`}
+              >
+                {filteredGlobalNetworkGroups.length === 0 ? (
+                  <p className="rounded-lg border border-white/10 bg-[#0B1120]/50 px-4 py-10 text-center text-sm text-slate-400">
+                    No universities matched your search term. Clear the search box to browse all {TOTAL_ENLISTED_UNIVERSITIES} universities.
+                  </p>
+                ) : (
+                  filteredGlobalNetworkGroups.map((group) => (
+                    <div key={`dest-roster-${group.id}`}>
+                      <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                        <div className="flex items-center gap-2.5">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-indigo-400/25 bg-indigo-500/15 text-indigo-300">
+                            <Building2 className="h-4 w-4" aria-hidden="true" />
+                          </div>
+                          <h4 className="font-display text-base font-bold text-white">
+                            {group.regionLabel}
+                          </h4>
+                        </div>
+                        <span className="font-mono text-xs text-cyan-300 tabular-nums">
+                          <AnimatedCounter value={group.universities.length} />{' '}
+                          Universities
+                        </span>
+                      </div>
+
+                      <div className="mt-4 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+                        {group.universities.map((uni, idx) => (
+                          <div
+                            key={`dest-uni-${group.id}-${uni.name}`}
+                            className="flex items-start gap-2.5 rounded-lg border border-white/10 bg-white/5 px-3.5 py-2.5 backdrop-blur-md transition-colors hover:border-cyan-400/50 hover:bg-white/10"
+                          >
+                            <span className="mt-0.5 font-mono text-[11px] font-medium text-cyan-300/80 tabular-nums">
+                              {String(idx + 1).padStart(3, '0')}
+                            </span>
+                            <div className="min-w-0">
+                              <p className="text-xs font-semibold text-white">
+                                {uni.name}
+                              </p>
+                              {uni.location && (
+                                <p className="mt-0.5 text-[11px] text-slate-400">
+                                  {uni.location}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>

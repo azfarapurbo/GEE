@@ -69,8 +69,8 @@ export interface StudentStory {
   intakeYear: string;
   outcomeMetric: string;
   quote: string;
-  portraitImage: string;
-  portraitAlt: string;
+  portraitImage?: string;
+  portraitAlt?: string;
 }
 
 export interface ConsultantProfile {
@@ -895,9 +895,6 @@ export const STUDENT_STORIES: StudentStory[] = [
     outcomeMetric: 'Erasmus Mundus Joint Master Scholarship Secured',
     quote:
       'Global Education Expert made my dream of studying at three prestigious European universities a reality. Their support in securing the Erasmus Mundus scholarship for Software Engineers For Green Deal was invaluable. I am incredibly grateful for their expertise.',
-    portraitImage:
-      'https://images.unsplash.com/photo-1770662369337-44ec308aba11?auto=format&fit=crop&w=1200&q=80',
-    portraitAlt: 'Md. Abdus Samad holding university graduation diploma outdoors in academic gown',
   },
   {
     id: 'story-kawsar',
@@ -912,9 +909,6 @@ export const STUDENT_STORIES: StudentStory[] = [
     outcomeMetric: 'Admitted to Duquesne University Business School (USA)',
     quote:
       'The team at Global Education Expert was instrumental in my successful admission to Duquesne University. Their personalized approach and in-depth knowledge made the process stress-free.',
-    portraitImage:
-      'https://images.unsplash.com/photo-1773921405330-edca29c118db?auto=format&fit=crop&w=1200&q=80',
-    portraitAlt: 'Mohammed Kawsar smiling outdoors in graduation cap and gown on university campus',
   },
   {
     id: 'story-sadat',
@@ -929,9 +923,6 @@ export const STUDENT_STORIES: StudentStory[] = [
     outcomeMetric: 'Enrolled in MSc Computing at Edinburgh Napier (UK)',
     quote:
       'Global Education Expert played a crucial role in helping me gain admission to one of the UK’s leading universities. Their tailored guidance ensured my successful enrollment in MSc Computing at Edinburgh Napier University.',
-    portraitImage:
-      'https://images.unsplash.com/photo-1773921403331-370386b92fa0?auto=format&fit=crop&w=1200&q=80',
-    portraitAlt: 'Syed Nazmus Sadat smiling on university steps after graduation ceremony',
   },
   {
     id: 'story-syful',
@@ -946,9 +937,6 @@ export const STUDENT_STORIES: StudentStory[] = [
     outcomeMetric: 'MBA Admission & Relocation to Berlin, Germany',
     quote:
       'The team at Global Education Expert was exceptional in helping me navigate the complex application process. I am now pursuing my MBA at BSBI in Berlin, all thanks to their expert advice and dedication.',
-    portraitImage:
-      'https://images.unsplash.com/photo-1782898638881-e84fcdaafb81?auto=format&fit=crop&w=1200&q=80',
-    portraitAlt: 'Syful Islam smiling in graduation attire after completing university studies',
   },
   {
     id: 'story-fabiha',
@@ -963,11 +951,205 @@ export const STUDENT_STORIES: StudentStory[] = [
     outcomeMetric: 'Full Admission & Visa Support for Medical Study Abroad',
     quote:
       'Global Education Expert is a company which helps foreign students to get admission in universities abroad. They are extremely helpful and informative. They guided & supported me for my education in Russia, and most importantly they are so genuine with their work.',
-    portraitImage:
-      'https://plus.unsplash.com/premium_photo-1713296255442-e9338f42aad8?auto=format&fit=crop&w=1200&q=80',
-    portraitAlt: 'Fabiha Bushra smiling outdoors on campus in natural daylight',
   },
 ];
+
+export interface ListedUniversity {
+  name: string;
+  location: string;
+}
+
+export type UniversityNetworkRegionId =
+  | 'usa'
+  | 'uk'
+  | 'europe'
+  | 'canada'
+  | 'australia-nz'
+  | 'malaysia'
+  | 'east-asia-global';
+
+export interface WebsiteUniversityGroup {
+  id: UniversityNetworkRegionId;
+  regionLabel: string;
+  universities: ListedUniversity[];
+}
+
+function normalizeUniversityKey(raw: string): string {
+  return raw
+    .replace(/\s*\((?:Germany|Hungary|Poland|Finland|Ireland|Austria|Sweden|Netherlands|BSBI,\s*Germany)\)\s*$/i, '')
+    .replace(/Northumbira/gi, 'Northumbria')
+    .replace(/[’‘]/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+function cleanDisplayUniversity(raw: string): string {
+  return raw
+    .replace(/\s*\((?:Germany|Hungary|Poland|Finland|Ireland|Austria|Sweden|Netherlands|BSBI,\s*Germany)\)\s*$/i, '')
+    .replace(/Northumbira/gi, 'Northumbria')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+export const ALL_WEBSITE_UNIVERSITIES_GROUPS: WebsiteUniversityGroup[] = (() => {
+  const buckets: Record<UniversityNetworkRegionId, Map<string, ListedUniversity>> = {
+    usa: new Map(),
+    uk: new Map(),
+    europe: new Map(),
+    canada: new Map(),
+    'australia-nz': new Map(),
+    malaysia: new Map(),
+    'east-asia-global': new Map(),
+  };
+
+  const add = (
+    region: UniversityNetworkRegionId,
+    rawName: string,
+    location: string
+  ) => {
+    const clean = cleanDisplayUniversity(rawName);
+    if (!clean) return;
+    const key = normalizeUniversityKey(clean);
+    if (!buckets[region].has(key)) {
+      buckets[region].set(key, { name: clean, location });
+    }
+  };
+
+  for (const row of DESTINATION_DIRECTORIES.usa) {
+    add('usa', row.universityName, row.universityLocation);
+  }
+  for (const row of DESTINATION_DIRECTORIES.uk) {
+    add('uk', row.universityName, row.universityLocation);
+  }
+  for (const row of DESTINATION_DIRECTORIES.europe) {
+    add('europe', row.universityName, row.universityLocation);
+  }
+  for (const row of DESTINATION_DIRECTORIES.canada) {
+    add('canada', row.universityName, row.universityLocation);
+  }
+  for (const row of DESTINATION_DIRECTORIES.australia) {
+    add('australia-nz', row.universityName, row.universityLocation);
+  }
+  for (const row of DESTINATION_DIRECTORIES.malaysia) {
+    add('malaysia', row.universityName, row.universityLocation);
+  }
+
+  for (const euEntry of EUROPE_COUNTRIES_UNIVERSITIES) {
+    const region: UniversityNetworkRegionId =
+      euEntry.country === 'United Kingdom' ? 'uk' : 'europe';
+    for (const uni of euEntry.universities) {
+      add(region, uni, euEntry.country);
+    }
+  }
+
+  for (const dest of STUDY_DESTINATIONS) {
+    const region: UniversityNetworkRegionId =
+      dest.id === 'canada'
+        ? 'canada'
+        : dest.id === 'usa'
+          ? 'usa'
+          : dest.id === 'uk'
+            ? 'uk'
+            : dest.id === 'australia'
+              ? 'australia-nz'
+              : dest.id === 'europe'
+                ? 'europe'
+                : dest.id === 'malaysia'
+                  ? 'malaysia'
+                  : 'east-asia-global';
+    for (const partner of dest.partnerUniversities) {
+      if (partner.name === 'Munich Business School & BSBI') {
+        add('europe', 'Munich Business School', 'Munich, Germany');
+        add('europe', 'Berlin School of Business & Innovation (BSBI)', 'Berlin, Germany');
+      } else if (partner.name === 'Dublin City University & University West') {
+        add('europe', 'Dublin City University', 'Dublin, Ireland');
+        add('europe', 'University West', 'Trollhättan, Sweden');
+      } else if (partner.name === 'Deakin & Western Sydney University') {
+        add('australia-nz', 'Deakin University', 'Melbourne, Australia');
+        add('australia-nz', 'Western Sydney University', 'Sydney, Australia');
+      } else {
+        add(region, partner.name, partner.city);
+      }
+    }
+  }
+
+  for (const grp of GLOBAL_PARTNER_GROUPS) {
+    for (const uni of grp.universities) {
+      if (grp.region.includes('Canada')) {
+        const isUs =
+          uni.includes('SUNY') ||
+          uni.includes('New York') ||
+          uni.includes('Rochester');
+        add(isUs ? 'usa' : 'canada', uni, isUs ? 'United States' : 'Canada');
+      } else if (grp.region.includes('Australia')) {
+        const isNz =
+          uni.includes('Auckland') || uni.includes('Victoria University');
+        add('australia-nz', uni, isNz ? 'New Zealand' : 'Australia / Global');
+      } else if (grp.region.includes('Europe')) {
+        add('europe', uni, 'Europe');
+      } else if (grp.region.includes('Malaysia')) {
+        add('malaysia', uni, 'Malaysia');
+      }
+    }
+  }
+
+  for (const story of STUDENT_STORIES) {
+    if (story.university.includes('Three Partner')) continue;
+    const region: UniversityNetworkRegionId =
+      story.destinationId === 'usa'
+        ? 'usa'
+        : story.destinationId === 'uk'
+          ? 'uk'
+          : story.destinationId === 'europe'
+            ? 'europe'
+            : 'east-asia-global';
+    add(region, story.university, story.destinationLabel);
+  }
+
+  return [
+    {
+      id: 'canada',
+      regionLabel: 'Canada',
+      universities: Array.from(buckets.canada.values()),
+    },
+    {
+      id: 'usa',
+      regionLabel: 'United States (USA)',
+      universities: Array.from(buckets.usa.values()),
+    },
+    {
+      id: 'uk',
+      regionLabel: 'United Kingdom (UK)',
+      universities: Array.from(buckets.uk.values()),
+    },
+    {
+      id: 'europe',
+      regionLabel: 'Europe (EU & EEA)',
+      universities: Array.from(buckets.europe.values()),
+    },
+    {
+      id: 'australia-nz',
+      regionLabel: 'Australia & New Zealand',
+      universities: Array.from(buckets['australia-nz'].values()),
+    },
+    {
+      id: 'malaysia',
+      regionLabel: 'Malaysia',
+      universities: Array.from(buckets.malaysia.values()),
+    },
+    {
+      id: 'east-asia-global',
+      regionLabel: 'East Asia & Global Medical',
+      universities: Array.from(buckets['east-asia-global'].values()),
+    },
+  ];
+})();
+
+export const TOTAL_ENLISTED_UNIVERSITIES = ALL_WEBSITE_UNIVERSITIES_GROUPS.reduce(
+  (sum, group) => sum + group.universities.length,
+  0
+);
 
 export const CONSULTANCY_TEAM: ConsultantProfile[] = [
   {

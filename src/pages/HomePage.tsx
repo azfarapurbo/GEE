@@ -4,13 +4,16 @@ import {
   Award,
   BookOpenCheck,
   Building2,
+  Camera,
   Clock,
   Compass,
   GraduationCap,
   Mail,
   Phone,
   Plane,
+  Search,
   ShieldCheck,
+  User,
 } from 'lucide-react';
 import { AnimatedCounter } from '../components/AnimatedCounter';
 import { AssessmentFormCard } from '../components/AssessmentFormCard';
@@ -18,14 +21,16 @@ import { PageId } from '../components/Navbar';
 import { ResilientImage } from '../components/ResilientImage';
 import { ScrollReveal } from '../components/ScrollReveal';
 import {
+  ALL_WEBSITE_UNIVERSITIES_GROUPS,
   COMPANY_CONTACT,
   DESTINATION_LANDMARK_IMAGES,
-  GLOBAL_PARTNER_GROUPS,
   HERO_COLLAGE_IMAGES,
   PHOTO_FALLBACK_SRC,
   SERVICE_LIFESTYLE_IMAGES,
   STUDENT_STORIES,
+  TOTAL_ENLISTED_UNIVERSITIES,
   TRUST_METRICS,
+  UniversityNetworkRegionId,
 } from '../data/consultancyData';
 import { CONSULTATION_EMAIL } from '../lib/consultations';
 import { DestinationRegionId } from './DestinationsPage';
@@ -235,12 +240,45 @@ const CORE_PILLARS = [
 
 export function HomePage({ onNavigate, onSelectDestination }: HomePageProps) {
   const [explorerFilter, setExplorerFilter] = useState<ExplorerCategory>('all');
+  const [partnerRegion, setPartnerRegion] = useState<
+    'all' | UniversityNetworkRegionId
+  >('all');
+  const [partnerSearch, setPartnerSearch] = useState('');
+  const [expandPartnerList, setExpandPartnerList] = useState(false);
+
   const featuredStories = STUDENT_STORIES.slice(0, 3);
 
   const visibleExplorerCards = useMemo(() => {
     if (explorerFilter === 'all') return EXPLORER_DESTINATIONS;
     return EXPLORER_DESTINATIONS.filter((d) => d.category === explorerFilter);
   }, [explorerFilter]);
+
+  const filteredPartnerGroups = useMemo(() => {
+    const q = partnerSearch.trim().toLowerCase();
+    return ALL_WEBSITE_UNIVERSITIES_GROUPS.filter(
+      (grp) => partnerRegion === 'all' || grp.id === partnerRegion
+    )
+      .map((grp) => ({
+        ...grp,
+        universities: q
+          ? grp.universities.filter(
+              (u) =>
+                u.name.toLowerCase().includes(q) ||
+                u.location.toLowerCase().includes(q)
+            )
+          : grp.universities,
+      }))
+      .filter((grp) => grp.universities.length > 0);
+  }, [partnerRegion, partnerSearch]);
+
+  const visibleEnlistedCount = useMemo(
+    () =>
+      filteredPartnerGroups.reduce(
+        (sum, grp) => sum + grp.universities.length,
+        0
+      ),
+    [filteredPartnerGroups]
+  );
 
   const scrollToAssessment = () => {
     const el = document.getElementById('book-assessment');
@@ -588,16 +626,17 @@ export function HomePage({ onNavigate, onSelectDestination }: HomePageProps) {
         </div>
       </section>
 
-      {/* 4. Partner Universities & Institutions Grid (Transparent Wrapper) */}
+      {/* 4. Partner Universities & Recognized Degree Networks Worldwide (Complete Website Roster) */}
       <section
         id="partners"
         className="mx-auto max-w-7xl bg-transparent px-4 py-16 sm:px-6 lg:px-8 lg:py-20"
       >
         <ScrollReveal>
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
             <div className="max-w-2xl">
               <p className="text-xs font-semibold tracking-wide text-cyan-300">
-                Global Institutional Network
+                Global Institutional Network ·{' '}
+                <AnimatedCounter value={TOTAL_ENLISTED_UNIVERSITIES} /> Enlisted Universities
               </p>
               <h2 className="mt-2 font-display text-2xl font-bold tracking-tight text-white [text-wrap:balance] sm:text-3xl">
                 Partner universities and recognized degree networks worldwide.
@@ -609,48 +648,143 @@ export function HomePage({ onNavigate, onSelectDestination }: HomePageProps) {
               className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-300 underline-offset-4 hover:text-white hover:underline whitespace-nowrap shrink-0"
             >
               <span>
-                View Full <AnimatedCounter value={576} />-University Directory
+                View Scholarship &amp; Location Tables ({TOTAL_ENLISTED_UNIVERSITIES})
               </span>
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </ScrollReveal>
 
-        <div className="mt-10 grid gap-5 md:grid-cols-2">
-          {GLOBAL_PARTNER_GROUPS.map((group, idx) => (
-            <ScrollReveal key={group.region} staggerIndex={idx % 2} className="h-full">
-              <div className="h-full rounded-xl border border-white/10 bg-[#0B1120]/60 p-6 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 hover:bg-white/10 hover:shadow-[0_0_24px_rgba(6,182,212,0.14)]">
-                <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-indigo-400/25 bg-indigo-500/15 text-indigo-300">
-                      <Building2 className="h-4 w-4" aria-hidden="true" />
-                    </div>
-                    <h3 className="font-display text-base font-bold text-white">
-                      {group.region}
-                    </h3>
-                  </div>
-                  <span className="font-mono text-xs text-cyan-300 tabular-nums">
-                    <AnimatedCounter value={group.universities.length} /> Partners
-                  </span>
-                </div>
-
-                <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-                  {group.universities.map((uni) => (
-                    <div
-                      key={uni}
-                      className="rounded-lg border border-white/10 bg-[#0B1120]/55 px-3.5 py-2.5 text-xs font-medium text-slate-200 transition-colors hover:border-indigo-400/40"
-                    >
-                      {uni}
-                    </div>
-                  ))}
-                </div>
+        <ScrollReveal className="mt-8">
+          <div className="rounded-xl border border-white/10 bg-[#0B1120]/60 p-5 backdrop-blur-xl sm:p-6">
+            {/* Search & View Toggle Controls */}
+            <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
+              <div className="relative w-full lg:max-w-md">
+                <Search
+                  className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400"
+                  aria-hidden="true"
+                />
+                <input
+                  type="search"
+                  value={partnerSearch}
+                  onChange={(e) => setPartnerSearch(e.target.value)}
+                  placeholder={`Search all ${TOTAL_ENLISTED_UNIVERSITIES} enlisted universities by name or location...`}
+                  aria-label="Search all enlisted universities worldwide"
+                  className="min-h-[42px] w-full rounded-lg border border-white/15 bg-[#0B1120]/80 py-2 pr-3 pl-9 text-sm text-white placeholder:text-slate-400 focus:border-cyan-400 focus:outline-none"
+                />
               </div>
-            </ScrollReveal>
-          ))}
-        </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="font-mono text-xs text-slate-300 tabular-nums">
+                  Showing {visibleEnlistedCount} of {TOTAL_ENLISTED_UNIVERSITIES}{' '}
+                  universities
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setExpandPartnerList((prev) => !prev)}
+                  className="min-h-[38px] rounded-lg border border-cyan-400/35 bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-cyan-200 transition-colors hover:border-cyan-400/70 hover:bg-white/10 whitespace-nowrap shrink-0"
+                >
+                  {expandPartnerList ? 'Compact Scroll View' : 'Expand All Universities'}
+                </button>
+              </div>
+            </div>
+
+            {/* Region Filter Tabs */}
+            <div
+              role="group"
+              aria-label="Filter enlisted universities by region"
+              className="mt-4 flex flex-wrap items-center gap-1 rounded-lg border border-white/10 bg-[#0B1120]/70 p-1"
+            >
+              <button
+                type="button"
+                onClick={() => setPartnerRegion('all')}
+                className={`min-h-[36px] rounded-md px-3 py-1.5 text-xs font-semibold transition-all whitespace-nowrap shrink-0 tabular-nums ${
+                  partnerRegion === 'all'
+                    ? 'bg-gradient-to-r from-[#4F46E5] to-[#06B6D4] text-white shadow-sm'
+                    : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                All Regions ({TOTAL_ENLISTED_UNIVERSITIES})
+              </button>
+              {ALL_WEBSITE_UNIVERSITIES_GROUPS.map((grp) => {
+                const active = partnerRegion === grp.id;
+                return (
+                  <button
+                    key={grp.id}
+                    type="button"
+                    onClick={() => setPartnerRegion(grp.id)}
+                    className={`min-h-[36px] rounded-md px-3 py-1.5 text-xs font-semibold transition-all whitespace-nowrap shrink-0 tabular-nums ${
+                      active
+                        ? 'bg-gradient-to-r from-[#4F46E5] to-[#06B6D4] text-white shadow-sm'
+                        : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    {grp.regionLabel} ({grp.universities.length})
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Complete Enlisted Universities Roster */}
+            <div
+              className={`mt-6 space-y-8 ${
+                expandPartnerList
+                  ? ''
+                  : 'max-h-[600px] overflow-y-auto pr-2'
+              }`}
+            >
+              {filteredPartnerGroups.length === 0 ? (
+                <p className="rounded-lg border border-white/10 bg-[#0B1120]/50 px-4 py-10 text-center text-sm text-slate-400">
+                  No universities matched your search term. Clear the search box to browse all {TOTAL_ENLISTED_UNIVERSITIES} universities.
+                </p>
+              ) : (
+                filteredPartnerGroups.map((group) => (
+                  <div key={group.id}>
+                    <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-indigo-400/25 bg-indigo-500/15 text-indigo-300">
+                          <Building2 className="h-4 w-4" aria-hidden="true" />
+                        </div>
+                        <h3 className="font-display text-base font-bold text-white">
+                          {group.regionLabel}
+                        </h3>
+                      </div>
+                      <span className="font-mono text-xs text-cyan-300 tabular-nums">
+                        <AnimatedCounter value={group.universities.length} /> Universities
+                      </span>
+                    </div>
+
+                    <div className="mt-4 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+                      {group.universities.map((uni, idx) => (
+                        <div
+                          key={`${group.id}-${uni.name}`}
+                          className="flex items-start gap-2.5 rounded-lg border border-white/10 bg-[#0B1120]/55 px-3.5 py-2.5 transition-colors hover:border-cyan-400/40 hover:bg-white/5"
+                        >
+                          <span className="mt-0.5 font-mono text-[11px] font-medium text-cyan-300/80 tabular-nums">
+                            {String(idx + 1).padStart(3, '0')}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="text-xs font-semibold text-white">
+                              {uni.name}
+                            </p>
+                            {uni.location && (
+                              <p className="mt-0.5 text-[11px] text-slate-400">
+                                {uni.location}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </ScrollReveal>
       </section>
 
-      {/* 5. Student Testimonials / Success Stories (Genuine Graduate Portraits + Dark Scrim) */}
+      {/* 5. Student Testimonials / Success Stories (Blank Photo Placeholders) */}
       <section className="border-y border-white/10 bg-transparent">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
           <ScrollReveal>
@@ -660,7 +794,7 @@ export function HomePage({ onNavigate, onSelectDestination }: HomePageProps) {
                   Verified Admissions Outcomes
                 </p>
                 <h2 className="mt-2 font-display text-2xl font-bold tracking-tight text-white [text-wrap:balance] sm:text-3xl">
-                  Recent student placements and visa approvals across four continents.
+                  Verified admissions, Erasmus Mundus awards, and international placements.
                 </h2>
               </div>
               <button
@@ -677,29 +811,26 @@ export function HomePage({ onNavigate, onSelectDestination }: HomePageProps) {
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
             {featuredStories.map((story, idx) => (
               <ScrollReveal key={story.id} staggerIndex={idx} className="h-full">
-                <blockquote className="group flex h-full flex-col justify-between overflow-hidden rounded-xl border border-white/10 bg-[#0B1120]/60 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 hover:bg-white/10 hover:shadow-[0_0_24px_rgba(6,182,212,0.14)]">
+                <blockquote className="flex h-full flex-col justify-between overflow-hidden rounded-xl border border-white/10 bg-[#0B1120]/60 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 hover:bg-white/10 hover:shadow-[0_0_24px_rgba(6,182,212,0.14)]">
                   <div>
-                    <div className="relative aspect-[16/10] w-full overflow-hidden">
-                      <ResilientImage
-                        src={story.portraitImage}
-                        alt={story.portraitAlt}
-                        fallbackSrc={PHOTO_FALLBACK_SRC}
-                        fallbackTitle={story.studentName}
-                        className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                      />
-                      <div
-                        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0B1120] via-[#0B1120]/40 to-transparent"
-                        aria-hidden="true"
-                      />
-                      <div className="absolute inset-x-0 bottom-0 p-4">
-                        <p className="text-xs font-semibold text-amber-300">
-                          {story.outcomeMetric}
+                    {/* Blank Student Photo Slot */}
+                    <div className="relative aspect-[16/10] w-full border-b border-white/10 bg-[#0B1120]/70 p-4">
+                      <div className="flex h-full w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-cyan-400/25 bg-white/[0.02] p-4 text-center">
+                        <div className="flex items-center gap-1.5 text-cyan-300/75">
+                          <User className="h-5 w-5" aria-hidden="true" />
+                          <Camera className="h-4 w-4 text-indigo-300/75" aria-hidden="true" />
+                        </div>
+                        <p className="mt-2 text-xs font-medium text-slate-400">
+                          Student Photo — Upload Slot
                         </p>
                       </div>
                     </div>
 
-                    <div className="px-6 pt-4">
-                      <p className="text-sm leading-relaxed text-slate-200">
+                    <div className="px-6 pt-5">
+                      <p className="text-xs font-semibold text-amber-300">
+                        {story.outcomeMetric}
+                      </p>
+                      <p className="mt-2.5 text-sm leading-relaxed text-slate-200">
                         “{story.quote}”
                       </p>
                     </div>

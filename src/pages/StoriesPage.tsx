@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Camera, User } from 'lucide-react';
 import { AnimatedCounter } from '../components/AnimatedCounter';
 import { PageId } from '../components/Navbar';
-import { ResilientImage } from '../components/ResilientImage';
 import { ScrollReveal } from '../components/ScrollReveal';
-import { PHOTO_FALLBACK_SRC, STUDENT_STORIES } from '../data/consultancyData';
+import { STUDENT_STORIES } from '../data/consultancyData';
 
 interface StoriesPageProps {
   onNavigate: (page: PageId) => void;
@@ -102,37 +101,36 @@ export function StoriesPage({ onNavigate }: StoriesPageProps) {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {stories.map((story, idx) => (
             <ScrollReveal key={story.id} staggerIndex={idx % 3} className="h-full">
-              <article className="group flex h-full flex-col justify-between overflow-hidden rounded-xl border border-white/10 bg-[#0B1120]/60 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 hover:bg-white/10">
+              <article className="flex h-full flex-col justify-between overflow-hidden rounded-xl border border-white/10 bg-[#0B1120]/60 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 hover:bg-white/10">
                 <div>
-                  <div className="relative aspect-[16/10] w-full overflow-hidden">
-                    <ResilientImage
-                      src={story.portraitImage}
-                      alt={story.portraitAlt}
-                      fallbackSrc={PHOTO_FALLBACK_SRC}
-                      fallbackTitle={story.studentName}
-                      className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div
-                      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0B1120] via-[#0B1120]/40 to-transparent"
-                      aria-hidden="true"
-                    />
-                    <div className="absolute inset-x-0 bottom-0 p-4">
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
-                        <span className="font-semibold text-cyan-300">
-                          {story.destinationLabel}
-                        </span>
-                        <span aria-hidden="true">·</span>
-                        <span>{story.degreeLevel}</span>
+                  {/* Blank Photo Slot Ready for Future Student Portrait */}
+                  <div className="relative aspect-[16/10] w-full border-b border-white/10 bg-[#0B1120]/70 p-4">
+                    <div className="flex h-full w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-cyan-400/25 bg-white/[0.02] p-4 text-center">
+                      <div className="flex items-center gap-1.5 text-cyan-300/75">
+                        <User className="h-5 w-5" aria-hidden="true" />
+                        <Camera className="h-4 w-4 text-indigo-300/75" aria-hidden="true" />
                       </div>
-                      <p className="mt-1 font-display text-sm font-semibold text-amber-300">
-                        {story.outcomeMetric}
+                      <p className="mt-2 text-xs font-medium text-slate-400">
+                        Student Photo — Upload Slot
                       </p>
                     </div>
                   </div>
 
-                  <blockquote className="px-6 pt-4 text-sm leading-relaxed text-slate-200">
-                    “{story.quote}”
-                  </blockquote>
+                  <div className="px-6 pt-5">
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                      <span className="font-semibold text-cyan-300">
+                        {story.destinationLabel}
+                      </span>
+                      <span aria-hidden="true">·</span>
+                      <span>{story.degreeLevel}</span>
+                    </div>
+                    <p className="mt-1.5 font-display text-sm font-semibold text-amber-300">
+                      {story.outcomeMetric}
+                    </p>
+                    <blockquote className="mt-3 text-sm leading-relaxed text-slate-200">
+                      “{story.quote}”
+                    </blockquote>
+                  </div>
                 </div>
 
                 <div className="mt-6 border-t border-white/10 px-6 py-4">
