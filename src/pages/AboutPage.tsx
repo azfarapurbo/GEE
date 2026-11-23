@@ -1,4 +1,4 @@
-import { ArrowRight, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BookOpenCheck, Globe, ShieldCheck } from 'lucide-react';
 import { AnimatedCounter } from '../components/AnimatedCounter';
 import { FounderExecutiveSection } from '../components/FounderExecutiveSection';
 import { PageId } from '../components/Navbar';
@@ -34,21 +34,47 @@ const TRUST_PRINCIPLES = [
   },
 ];
 
+const MAJOR_STUDY_DESTINATIONS = [
+  {
+    region: 'North America',
+    countries: 'United States (USA), Canada',
+  },
+  {
+    region: 'Europe & UK',
+    countries: 'United Kingdom, European Union / Schengen Nations',
+  },
+  {
+    region: 'Asia-Pacific',
+    countries: 'Australia, Malaysia',
+  },
+];
+
+const ACADEMIC_PROGRAMS_HANDLED = [
+  'Pre-University & Foundation / Diploma Programs',
+  "Undergraduate Degrees (Bachelor's)",
+  "Postgraduate Degrees (Master's, MBA)",
+  'Specialized Professional Programs (MBBS, Healthcare, Technical Diplomas)',
+  'Research & Doctorate (Ph.D.) Tracks',
+];
+
 export function AboutPage({ onNavigate }: AboutPageProps) {
   return (
     <div className="bg-transparent text-white">
-      <section className="border-b border-white/10 bg-transparent">
+      <section
+        id="about"
+        className="scroll-mt-20 border-b border-white/10 bg-transparent"
+      >
         <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
           <div className="grid items-stretch gap-10 lg:grid-cols-12 lg:gap-12">
             <div className="flex flex-col justify-center lg:col-span-6">
-              <p className="text-xs font-semibold tracking-wide text-cyan-300">
+              <div className="inline-flex w-fit items-center rounded-md border border-cyan-400/30 bg-cyan-500/10 px-3 py-1 text-xs font-semibold tracking-wide text-cyan-300">
+                A Concern of Sunshine Education
+              </div>
+              <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-white [text-wrap:balance] sm:text-4xl">
                 About Global Education Expert
-              </p>
-              <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-white [text-wrap:balance] sm:text-4xl">
-                An admissions advisory built on academic rigor and honest counsel.
               </h1>
               <p className="mt-4 text-base leading-relaxed text-slate-300">
-                Founded to replace high-pressure sales agencies with accountable academic advising, Global Education Expert helps international students gain entry to reputable universities across Malaysia, Europe, the United Kingdom, and East Asia.
+                Global Education Expert is a company of SUNSHINE EDUCATION, a premier foreign education and study abroad consultancy firm based in Bangladesh. We specialize in facilitating cross-border higher education pathways for students aiming to pursue undergraduate, postgraduate, diploma, and specialized professional programs (such as MBBS/medicine) in leading destination countries across North America, Europe, Australia, and Asia.
               </p>
 
               <div className="mt-8 grid gap-6 border-t border-white/10 pt-6 sm:grid-cols-2">
@@ -128,6 +154,93 @@ export function AboutPage({ onNavigate }: AboutPageProps) {
 
       {/* Meet Our Founder & Owner Executive Profile */}
       <FounderExecutiveSection />
+
+      {/* 3. Study Destinations & Academic Levels Two-Column Showcase */}
+      <section className="mx-auto max-w-7xl bg-transparent px-4 pt-12 sm:px-6 lg:px-8">
+        <ScrollReveal>
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Column A: Major Study Destinations */}
+            <div className="flex h-full flex-col justify-between rounded-xl border border-white/10 bg-[#0B1120]/60 p-6 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 sm:p-7">
+              <div>
+                <div className="flex items-center gap-2.5 text-cyan-300">
+                  <Globe className="h-5 w-5 shrink-0" aria-hidden="true" />
+                  <span className="text-xs font-semibold tracking-wide text-cyan-300">
+                    Global Study Corridors
+                  </span>
+                </div>
+                <h2 className="mt-2 font-display text-xl font-bold tracking-tight text-white sm:text-2xl">
+                  Major Study Destinations
+                </h2>
+                <div className="mt-5 space-y-3 border-t border-white/10 pt-4">
+                  {MAJOR_STUDY_DESTINATIONS.map((item) => (
+                    <div
+                      key={item.region}
+                      className="rounded-lg border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-md transition-colors hover:border-cyan-400/40"
+                    >
+                      <p className="text-xs font-semibold text-amber-300">
+                        {item.region}
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-white">
+                        {item.countries}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-6 border-t border-white/10 pt-4">
+                <button
+                  type="button"
+                  onClick={() => onNavigate('destinations')}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-300 underline-offset-4 hover:text-white hover:underline whitespace-nowrap shrink-0"
+                >
+                  <span>Explore University Directories</span>
+                  <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+
+            {/* Column B: Academic Programs Handled */}
+            <div className="flex h-full flex-col justify-between rounded-xl border border-white/10 bg-[#0B1120]/60 p-6 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/50 sm:p-7">
+              <div>
+                <div className="flex items-center gap-2.5 text-cyan-300">
+                  <BookOpenCheck className="h-5 w-5 shrink-0" aria-hidden="true" />
+                  <span className="text-xs font-semibold tracking-wide text-cyan-300">
+                    Study Levels &amp; Disciplines
+                  </span>
+                </div>
+                <h2 className="mt-2 font-display text-xl font-bold tracking-tight text-white sm:text-2xl">
+                  Academic Programs Handled
+                </h2>
+                <ul className="mt-5 space-y-2.5 border-t border-white/10 pt-4">
+                  {ACADEMIC_PROGRAMS_HANDLED.map((program, idx) => (
+                    <li
+                      key={program}
+                      className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-200 backdrop-blur-md transition-colors hover:border-cyan-400/40"
+                    >
+                      <span className="mt-0.5 font-mono text-xs font-semibold text-cyan-300 tabular-nums">
+                        0{idx + 1}.
+                      </span>
+                      <span className="font-medium text-white">{program}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="mt-6 border-t border-white/10 pt-4">
+                <button
+                  type="button"
+                  onClick={() => onNavigate('services')}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-300 underline-offset-4 hover:text-white hover:underline whitespace-nowrap shrink-0"
+                >
+                  <span>View Admissions &amp; Scholarship Guidance</span>
+                  <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </ScrollReveal>
+      </section>
 
       {/* Why Students Trust Us */}
       <section className="mx-auto max-w-7xl bg-transparent px-4 py-14 sm:px-6 lg:px-8">

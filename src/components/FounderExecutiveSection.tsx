@@ -1,5 +1,15 @@
 import { useState } from 'react';
-import { Award, Briefcase, Camera, ExternalLink, Globe2, User } from 'lucide-react';
+import {
+  Award,
+  BadgeCheck,
+  Briefcase,
+  Camera,
+  ExternalLink,
+  Globe2,
+  GraduationCap,
+  ShieldCheck,
+  User,
+} from 'lucide-react';
 import { AnimatedCounter } from './AnimatedCounter';
 import { ScrollReveal } from './ScrollReveal';
 
@@ -18,6 +28,44 @@ function LinkedInIcon() {
     </svg>
   );
 }
+
+const EDUCATION_CREDENTIALS = [
+  'MSc, Political Economy & Economic History — The London School of Economics and Political Science (LSE)',
+  'BSc, Development Economics, International Development, Political Economy & Area Studies — SOAS, University of London',
+];
+
+const LEADERSHIP_EXPERIENCE = [
+  'Director of Operations, Sunshine Education Group (2011 – Present)',
+  'Principal, Sunshine Grammar School (2022 – 2026)',
+  'SAT Test Center Supervisor, College Board — Center #74108 (2016 – Present)',
+  'Student Counsellor, Sunshine Grammar School (2014 – 2022) — Guided students into top global universities including Cornell, UCL, University of Manchester, NYU, HKUST, University of Melbourne, KAIST, BUET, IUT, and CUET.',
+];
+
+const INTERNATIONAL_DELEGATIONS = [
+  'Delegate, Atlantic Canada FAM Tour — Canadian High Commission (2023)',
+  'Delegate, South Asia Education Mission to Australia — Australian High Commission (2018)',
+  'Delegate, Austrade High School Mission (South Asia) — Australian High Commission (2017)',
+];
+
+const PROFESSIONAL_CERTIFICATIONS = [
+  'UK Agent & Counsellor Training — Certification Award',
+  'Ethical Business Practices in International Student Recruitment',
+  'ApplyBoard Counsellor Course — Ireland',
+];
+
+const KEY_PLACEMENTS = [
+  'College Board Center #74108',
+  'Cornell',
+  'UCL',
+  'University of Manchester',
+  'NYU',
+  'HKUST',
+  'University of Melbourne',
+  'KAIST',
+  'BUET',
+  'IUT',
+  'CUET',
+];
 
 const VENTURE_ECOSYSTEM = [
   { id: 'gee', label: 'Global Education Expert' },
@@ -67,7 +115,7 @@ export function FounderExecutiveSection() {
                   <div className="group relative h-full w-full overflow-hidden rounded-[12px] bg-[#0B1120]/80">
                     <img
                       src={imgSrc}
-                      alt="Samir Rahman — Founder & Owner of Global Education Expert"
+                      alt="Samir Rahman — Director of Operations, Sunshine Education Group & Founder of Global Education Expert"
                       onError={handleImageError}
                       className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                     />
@@ -85,12 +133,12 @@ export function FounderExecutiveSection() {
               </div>
             </div>
 
-            {/* 2. Profile Header, LinkedIn CTA, Overview Bio & Ecosystem Badges */}
+            {/* 2. Profile Header, LinkedIn CTA, Bio Summary & Key Placement Badges */}
             <div className="min-w-0 flex-1">
               <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                 <div>
                   <p className="text-xs font-semibold tracking-wide text-cyan-300">
-                    Meet Our Founder &amp; Owner
+                    Leadership Spotlight · Founder &amp; Owner
                   </p>
                   <h2
                     id="founder-profile-heading"
@@ -99,7 +147,7 @@ export function FounderExecutiveSection() {
                     Samir Rahman
                   </h2>
                   <p className="mt-1.5 text-sm leading-relaxed font-medium text-amber-300">
-                    Founder &amp; Owner, Global Education Expert | Director of Operations, Sunshine Education Group | MSc, London School of Economics (LSE)
+                    Director of Operations, Sunshine Education Group | Former Principal, Sunshine Grammar School
                   </p>
                 </div>
 
@@ -115,36 +163,29 @@ export function FounderExecutiveSection() {
                 </a>
               </div>
 
-              {/* 3. Authoritative Executive Overview */}
+              {/* Bio Summary */}
               <div className="mt-5 space-y-3 text-sm leading-relaxed text-slate-200 sm:text-[15px]">
                 <p>
-                  An alumnus of the London School of Economics (LSE), Samir Rahman leads Global Education Expert and serves as Director of Operations at Sunshine Education Group—overseeing Chattogram’s oldest international school (est. 1985) and pioneering global curricula including Cambridge (CAIE), Pearson Edexcel, and Western Australian (WACE) programs.
-                </p>
-                <p>
-                  As a longtime College Board SAT Center Supervisor (Center #74108) and senior university counselor, he has guided students to secure admissions into world-renowned institutions including Cornell, UCL, NYU, University of Melbourne, HKUST, and KAIST, alongside top engineering universities like BUET.
+                  Samir Rahman has led Sunshine Education&apos;s schools—including Sunshine Grammar School, the oldest international school in Chattogram—and international pathway programs for over 15 years. He has also served as the official College Board SAT Test Center Supervisor at the school since 2016.
                 </p>
               </div>
 
-              {/* 5. Venturing & Ed-Tech Innovation Badges */}
-              <div className="mt-6 border-t border-white/10 pt-5">
+              {/* Key University Placements & Test Center Authority Tags */}
+              <div className="mt-5 border-t border-white/10 pt-4">
                 <p className="text-xs font-semibold tracking-wide text-slate-400">
-                  Leadership &amp; Ed-Tech Innovation Ecosystem
+                  Authorized Test Center &amp; Notable Alumni University Placements
                 </p>
                 <div className="mt-2.5 flex flex-wrap gap-2">
-                  {VENTURE_ECOSYSTEM.map((item) => (
+                  {KEY_PLACEMENTS.map((badge, index) => (
                     <span
-                      key={item.id}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-200 backdrop-blur-md transition-colors hover:border-cyan-400/40 hover:bg-white/10 hover:text-white"
+                      key={badge}
+                      className={`inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-medium backdrop-blur-md transition-colors ${
+                        index === 0
+                          ? 'border-amber-400/35 bg-amber-500/10 text-amber-200'
+                          : 'border-cyan-400/20 bg-white/5 text-slate-200 hover:border-cyan-400/45 hover:text-white'
+                      }`}
                     >
-                      <span>
-                        {item.label}
-                        {item.count ? (
-                          <>
-                            {' '}
-                            (<AnimatedCounter value={item.count} /> students tested)
-                          </>
-                        ) : null}
-                      </span>
+                      {badge}
                     </span>
                   ))}
                 </div>
@@ -152,8 +193,83 @@ export function FounderExecutiveSection() {
             </div>
           </div>
 
+          {/* 3. Scannable Executive Credentials Grid */}
+          <div className="mt-8 grid gap-6 border-t border-white/10 pt-8 md:grid-cols-2">
+            {/* Education */}
+            <div className="rounded-xl border border-white/10 bg-[#0B1120]/55 p-5 backdrop-blur-md">
+              <div className="flex items-center gap-2 text-cyan-300">
+                <GraduationCap className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <h3 className="font-display text-sm font-bold tracking-wide text-white">
+                  Education
+                </h3>
+              </div>
+              <ul className="mt-3 space-y-2.5 border-t border-white/10 pt-3 text-xs leading-relaxed text-slate-200 sm:text-sm">
+                {EDUCATION_CREDENTIALS.map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Leadership & Counselling Experience */}
+            <div className="rounded-xl border border-white/10 bg-[#0B1120]/55 p-5 backdrop-blur-md">
+              <div className="flex items-center gap-2 text-cyan-300">
+                <Briefcase className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <h3 className="font-display text-sm font-bold tracking-wide text-white">
+                  Leadership &amp; Counselling Experience
+                </h3>
+              </div>
+              <ul className="mt-3 space-y-2.5 border-t border-white/10 pt-3 text-xs leading-relaxed text-slate-200 sm:text-sm">
+                {LEADERSHIP_EXPERIENCE.map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* International Delegations */}
+            <div className="rounded-xl border border-white/10 bg-[#0B1120]/55 p-5 backdrop-blur-md">
+              <div className="flex items-center gap-2 text-cyan-300">
+                <Globe2 className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <h3 className="font-display text-sm font-bold tracking-wide text-white">
+                  International Delegations
+                </h3>
+              </div>
+              <ul className="mt-3 space-y-2.5 border-t border-white/10 pt-3 text-xs leading-relaxed text-slate-200 sm:text-sm">
+                {INTERNATIONAL_DELEGATIONS.map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Professional Certifications */}
+            <div className="rounded-xl border border-white/10 bg-[#0B1120]/55 p-5 backdrop-blur-md">
+              <div className="flex items-center gap-2 text-cyan-300">
+                <BadgeCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <h3 className="font-display text-sm font-bold tracking-wide text-white">
+                  Professional Certifications
+                </h3>
+              </div>
+              <ul className="mt-3 space-y-2.5 border-t border-white/10 pt-3 text-xs leading-relaxed text-slate-200 sm:text-sm">
+                {PROFESSIONAL_CERTIFICATIONS.map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
           {/* 4. Key Authority & Diplomatic Highlights (3-Column Glass Cards with Animated Counters) */}
-          <div className="mt-8 grid gap-5 border-t border-white/10 pt-8 md:grid-cols-3">
+          <div className="mt-6 grid gap-5 md:grid-cols-3">
             <div className="rounded-xl border border-white/10 bg-[#0B1120]/60 p-5 backdrop-blur-md transition-all duration-300 hover:border-cyan-400/50 hover:bg-white/10">
               <div className="flex items-center gap-2.5 text-cyan-300">
                 <Briefcase className="h-4 w-4 shrink-0" aria-hidden="true" />
@@ -165,7 +281,7 @@ export function FounderExecutiveSection() {
                 Educational Leadership &amp; Operations
               </h3>
               <p className="mt-2 text-xs leading-relaxed text-slate-300">
-                Director of Operations at Sunshine Education Group &amp; former Principal of Sunshine Grammar School.
+                Director of Operations at Sunshine Education Group (2011 – Present) &amp; former Principal of Sunshine Grammar School (2022 – 2026).
               </p>
             </div>
 
@@ -186,7 +302,7 @@ export function FounderExecutiveSection() {
 
             <div className="rounded-xl border border-white/10 bg-[#0B1120]/60 p-5 backdrop-blur-md transition-all duration-300 hover:border-cyan-400/50 hover:bg-white/10">
               <div className="flex items-center gap-2.5 text-cyan-300">
-                <Globe2 className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
                 <span className="font-display text-xl font-bold text-white tabular-nums">
                   <AnimatedCounter value={3} /> Diplomatic Missions
                 </span>
@@ -195,8 +311,33 @@ export function FounderExecutiveSection() {
                 International University Delegate
               </h3>
               <p className="mt-2 text-xs leading-relaxed text-slate-300">
-                Selected by the High Commissions of Australia and Canada for the Austrade Mission 2017, South Asia Education Mission to Australia 2018, and Atlantic Canada FAM Tour 2023—visiting G8 Australian and top Canadian public universities.
+                Canadian High Commission Atlantic Canada FAM Tour (2023), Australian High Commission South Asia Mission (2018), and Austrade Mission (2017).
               </p>
+            </div>
+          </div>
+
+          {/* 5. Leadership & Ed-Tech Innovation Ecosystem Badges */}
+          <div className="mt-6 border-t border-white/10 pt-5">
+            <p className="text-xs font-semibold tracking-wide text-slate-400">
+              Leadership &amp; Ed-Tech Innovation Ecosystem
+            </p>
+            <div className="mt-2.5 flex flex-wrap gap-2">
+              {VENTURE_ECOSYSTEM.map((item) => (
+                <span
+                  key={item.id}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-200 backdrop-blur-md transition-colors hover:border-cyan-400/40 hover:bg-white/10 hover:text-white"
+                >
+                  <span>
+                    {item.label}
+                    {item.count ? (
+                      <>
+                        {' '}
+                        (<AnimatedCounter value={item.count} /> students tested)
+                      </>
+                    ) : null}
+                  </span>
+                </span>
+              ))}
             </div>
           </div>
         </div>

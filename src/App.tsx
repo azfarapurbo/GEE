@@ -62,6 +62,17 @@ export default function App() {
     }
     setCurrentPage(page);
     window.location.hash = page;
+    if (page === 'about') {
+      window.setTimeout(() => {
+        const el = document.getElementById('about');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 60);
+      return;
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
