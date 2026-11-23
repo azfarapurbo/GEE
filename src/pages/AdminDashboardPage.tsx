@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { onAuthStateChanged, signInWithPopup, signOut, User } from 'firebase/auth';
 import {
   Download,
@@ -16,8 +16,8 @@ import {
 } from '../lib/consultations';
 import {
   auth,
-  AUTHORIZED_ADMIN_EMAILS,
   googleAuthProvider,
+  isAuthorizedAdminEmail,
 } from '../lib/firebase';
 import { CONSULTATION_STATUSES, ConsultationStatus } from '../lib/validation';
 
@@ -28,9 +28,45 @@ const STATUS_LABELS: Record<ConsultationStatus, string> = {
   archived: 'Archived',
 };
 
+const EXPECTED_POPUP_CANCEL_CODES = new Set([
+  'auth/popup-closed-by-user',
+  'auth/user-cancelled',
+  'auth/cancelled-popup-request',
+  'auth/popup-blocked',
+]);
+
+function getFirebaseErrorCode(err: unknown): string {
+  if (typeof err === 'object' && err !== null && 'code' in err) {
+    return String((err as { code: unknown }).code);
+  }
+  return '';
+}
+
+function formatGoogleSignInError(err: unknown): string {
+  const code = getFirebaseErrorCode(err);
+  switch (code) {
+    case 'auth/popup-closed-by-user':
+      return 'The Google sign-in window was closed before completing login. Click "Sign in with Google" to try again.';
+    case 'auth/user-cancelled':
+      return 'Google sign-in permission was declined. Please choose your authorized account and approve access to continue.';
+    case 'auth/cancelled-popup-request':
+      return 'A Google sign-in window is already in progress. Please finish or close the open popup and try again.';
+    case 'auth/popup-blocked':
+      return 'Your browser blocked the Google sign-in popup. Please allow popups for this site and click "Sign in with Google" again.';
+    case 'auth/unauthorized-domain':
+      return 'This domain is not authorized for Firebase Google Sign-In. Add the current hostname under Firebase Authentication → Settings → Authorized domains.';
+    case 'auth/network-request-failed':
+      return 'Network error while connecting to Google sign-in. Please check your internet connection and try again.';
+    default:
+      return 'Unable to complete Google sign-in right now. Please try again.';
+  }
+}
+
 export function AdminDashboardPage() {
   const [user, setUser] = useState<User | null>(auth.currentUser);
   const [authReady, setAuthReady] = useState(false);
+  const [signingIn, setSigningIn] = useState(false);
+  const signingInRef = useRef(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
   const [records, setRecords] = useState<ConsultationRecord[]>([]);
@@ -56,7 +92,7 @@ export function AdminDashboardPage() {
   const isAuthorizedAdmin =
     Boolean(user) &&
     Boolean(user?.emailVerified) &&
-    AUTHORIZED_ADMIN_EMAILS.includes((user?.email ?? '').toLowerCase());
+    isAuthorizedAdminEmail(user?.email);
 
   useEffect(() => {
     if (!authReady || !isAuthorizedAdmin) {
@@ -94,18 +130,32 @@ export function AdminDashboardPage() {
   };
 
   const handleGoogleSignIn = async () => {
+    if (signingInRef.current) return;
+    signingInRef.current = true;
+    setSigningIn(true);
     setAuthError(null);
     try {
       await signInWithPopup(auth, googleAuthProvider);
     } catch (err) {
-      console.error('Admin sign-in error:', err);
-      setAuthError('Sign-in was cancelled or blocked. Please allow popups and try again.');
+      const code = getFirebaseErrorCode(err);
+      if (!EXPECTED_POPUP_CANCEL_CODES.has(code)) {
+        console.warn('Admin sign-in warning:', code || err);
+      }
+      setAuthError(formatGoogleSignInError(err));
+    } finally {
+      signingInRef.current = false;
+      setSigningIn(false);
     }
   };
 
   const handleSignOut = async () => {
-    await signOut(auth);
-    setSelectedId(null);
+    try {
+      await signOut(auth);
+      setSelectedId(null);
+      setAuthError(null);
+    } catch {
+      setAuthError('Could not sign out cleanly. Please refresh and try again.');
+    }
   };
 
   const handleSaveChanges = async () => {
@@ -224,7 +274,10 @@ export function AdminDashboardPage() {
           </p>
 
           {authError && (
-            <p className="mt-4 rounded-lg border border-red-400/30 bg-red-500/15 px-3 py-2 text-xs text-red-200">
+            <p
+              role="alert"
+              className="mt-4 rounded-lg border border-red-400/30 bg-red-500/15 px-3 py-2 text-xs text-red-200"
+            >
               {authError}
             </p>
           )}
@@ -232,9 +285,10 @@ export function AdminDashboardPage() {
           <button
             type="button"
             onClick={handleGoogleSignIn}
-            className="mt-6 inline-flex min-h-[44px] w-full items-center justify-center rounded-lg bg-gradient-to-r from-[#4F46E5] to-[#06B6D4] px-5 py-3 text-sm font-semibold text-white transition-all hover:shadow-[0_0_24px_rgba(6,182,212,0.5)]"
+            disabled={signingIn}
+            className="mt-6 inline-flex min-h-[44px] w-full items-center justify-center rounded-lg bg-gradient-to-r from-[#4F46E5] to-[#06B6D4] px-5 py-3 text-sm font-semibold text-white transition-all hover:shadow-[0_0_24px_rgba(6,182,212,0.5)] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Sign in with Google
+            {signingIn ? 'Signing in with Google...' : 'Sign in with Google'}
           </button>
         </div>
       </div>

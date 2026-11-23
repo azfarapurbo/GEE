@@ -1,19 +1,59 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { doc, getDocFromServer, getFirestore } from 'firebase/firestore';
-import firebaseConfig from '../../firebase-applet-config.json';
+import appletConfig from '../../firebase-applet-config.json';
 
-const app = initializeApp(firebaseConfig);
+function readEnv(key: string): string {
+  const env = import.meta.env as Record<string, string | undefined>;
+  const val = env[key];
+  return typeof val === 'string' ? val.trim() : '';
+}
 
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+const resolvedConfig = {
+  apiKey: readEnv('VITE_FIREBASE_API_KEY') || appletConfig.apiKey,
+  authDomain: readEnv('VITE_FIREBASE_AUTH_DOMAIN') || appletConfig.authDomain,
+  projectId: readEnv('VITE_FIREBASE_PROJECT_ID') || appletConfig.projectId,
+  storageBucket: readEnv('VITE_FIREBASE_STORAGE_BUCKET') || appletConfig.storageBucket,
+  messagingSenderId:
+    readEnv('VITE_FIREBASE_MESSAGING_SENDER_ID') || appletConfig.messagingSenderId,
+  appId: readEnv('VITE_FIREBASE_APP_ID') || appletConfig.appId,
+  firestoreDatabaseId:
+    readEnv('VITE_FIREBASE_DATABASE_ID') || appletConfig.firestoreDatabaseId || '(default)',
+};
+
+export const isFirebaseConfigured = Boolean(
+  resolvedConfig.apiKey && resolvedConfig.projectId && resolvedConfig.appId
+);
+
+const app = initializeApp(resolvedConfig);
+
+export const db =
+  resolvedConfig.firestoreDatabaseId && resolvedConfig.firestoreDatabaseId !== '(default)'
+    ? getFirestore(app, resolvedConfig.firestoreDatabaseId)
+    : getFirestore(app);
 export const auth = getAuth(app);
 export const googleAuthProvider = new GoogleAuthProvider();
+googleAuthProvider.setCustomParameters({ prompt: 'select_account' });
 
 export const BOOTSTRAPPED_ADMIN_EMAIL = 'azfar.mazumder@gmail.com';
-export const AUTHORIZED_ADMIN_EMAILS = [
-  'azfar.mazumder@gmail.com',
-  'info.globaleduexp@gmail.com',
-];
+
+const extraEnvAdmins = readEnv('VITE_ADMIN_EMAILS')
+  .split(',')
+  .map((s) => s.trim().toLowerCase())
+  .filter(Boolean);
+
+export const AUTHORIZED_ADMIN_EMAILS = Array.from(
+  new Set([
+    'azfar.mazumder@gmail.com',
+    'info.globaleduexp@gmail.com',
+    ...extraEnvAdmins,
+  ])
+);
+
+export function isAuthorizedAdminEmail(email: string | null | undefined): boolean {
+  if (!email) return false;
+  return AUTHORIZED_ADMIN_EMAILS.includes(email.trim().toLowerCase());
+}
 
 export enum OperationType {
   CREATE = 'create',
@@ -68,6 +108,7 @@ export function handleFirestoreError(
 }
 
 async function testConnection() {
+  if (!isFirebaseConfigured) return;
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));
   } catch (error) {

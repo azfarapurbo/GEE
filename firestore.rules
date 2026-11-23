@@ -108,6 +108,121 @@ service cloud.firestore {
       data.updatedAt is timestamp;
     }
 
+    function isValidPortalDestination(dest) {
+      return dest in [
+        'USA',
+        'Canada',
+        'UK',
+        'Europe/Schengen',
+        'Australia',
+        'Malaysia'
+      ];
+    }
+
+    function isValidPortalAcademicLevel(level) {
+      return level in [
+        'Foundation/Diploma',
+        "Bachelor's",
+        "Master's/MBA",
+        'MBBS/Healthcare',
+        'Ph.D.'
+      ];
+    }
+
+    function isValidApplicationStage(stage) {
+      return stage in [
+        'Profile Submitted',
+        'Document Review',
+        'University Applied',
+        'Offer Letter',
+        'Visa Processing',
+        'Visa Approved'
+      ];
+    }
+
+    function isValidDocStatus(st) {
+      return st in ['missing', 'uploaded', 'verified'];
+    }
+
+    function isValidStudent(data) {
+      return data.keys().hasAll([
+        'uid',
+        'role',
+        'fullName',
+        'email',
+        'phone',
+        'preferredDestination',
+        'academicLevel',
+        'applicationStage',
+        'assignedCounselor',
+        'passportStatus',
+        'passportFileName',
+        'transcriptsStatus',
+        'transcriptsFileName',
+        'englishTestStatus',
+        'englishTestFileName',
+        'sopStatus',
+        'sopFileName',
+        'createdAt',
+        'updatedAt'
+      ]) &&
+      data.keys().hasOnly([
+        'uid',
+        'role',
+        'fullName',
+        'email',
+        'phone',
+        'preferredDestination',
+        'academicLevel',
+        'applicationStage',
+        'assignedCounselor',
+        'passportStatus',
+        'passportFileName',
+        'transcriptsStatus',
+        'transcriptsFileName',
+        'englishTestStatus',
+        'englishTestFileName',
+        'sopStatus',
+        'sopFileName',
+        'createdAt',
+        'updatedAt'
+      ]) &&
+      data.uid is string && isValidId(data.uid) &&
+      data.role == 'student' &&
+      data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 100 &&
+      data.email is string && data.email.size() >= 5 && data.email.size() <= 120 &&
+      data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$') &&
+      data.phone is string && data.phone.size() >= 7 && data.phone.size() <= 30 &&
+      data.phone.matches('^\\+?[0-9\\s\\-()]{7,30}$') &&
+      data.preferredDestination is string && isValidPortalDestination(data.preferredDestination) &&
+      data.academicLevel is string && isValidPortalAcademicLevel(data.academicLevel) &&
+      data.applicationStage is string && isValidApplicationStage(data.applicationStage) &&
+      data.assignedCounselor is string && data.assignedCounselor.size() >= 2 && data.assignedCounselor.size() <= 120 &&
+      data.passportStatus is string && isValidDocStatus(data.passportStatus) &&
+      data.passportFileName is string && data.passportFileName.size() <= 140 &&
+      data.transcriptsStatus is string && isValidDocStatus(data.transcriptsStatus) &&
+      data.transcriptsFileName is string && data.transcriptsFileName.size() <= 140 &&
+      data.englishTestStatus is string && isValidDocStatus(data.englishTestStatus) &&
+      data.englishTestFileName is string && data.englishTestFileName.size() <= 140 &&
+      data.sopStatus is string && isValidDocStatus(data.sopStatus) &&
+      data.sopFileName is string && data.sopFileName.size() <= 140 &&
+      data.createdAt is timestamp &&
+      data.updatedAt is timestamp;
+    }
+
+    function isStudentDocUpdateAllowed(statusVal, prevStatusVal, fileVal, prevFileVal) {
+      return (statusVal == prevStatusVal && fileVal == prevFileVal) || statusVal == 'uploaded';
+    }
+
+    function isValidStudentNote(data) {
+      return data.keys().hasAll(['studentId', 'notes', 'updatedBy', 'updatedAt']) &&
+        data.keys().hasOnly(['studentId', 'notes', 'updatedBy', 'updatedAt']) &&
+        data.studentId is string && isValidId(data.studentId) &&
+        data.notes is string && data.notes.size() <= 2000 &&
+        data.updatedBy is string && data.updatedBy.size() >= 2 && data.updatedBy.size() <= 120 &&
+        data.updatedAt is timestamp;
+    }
+
     // Connection check document used on app startup
     match /test/connection {
       allow get: if true;
@@ -137,6 +252,93 @@ service cloud.firestore {
         incoming().updatedAt == request.time &&
         incoming().diff(existing()).affectedKeys().hasOnly(['status', 'adminNotes', 'updatedAt']);
       allow delete: if isValidId(consultationId) && isAdmin();
+    }
+
+    // Students collection: owner read/create/self-update (Tier 2); admin read/list/verify/stage update (Tier 1)
+    match /students/{studentId} {
+      allow get: if isValidId(studentId) && (
+        isAdmin() ||
+        (isSignedIn() && request.auth.uid == studentId)
+      );
+      allow list: if isAdmin();
+      allow create: if isValidId(studentId) &&
+        isVerifiedUser() &&
+        request.auth.uid == studentId &&
+        isValidStudent(incoming()) &&
+        incoming().uid == request.auth.uid &&
+        incoming().email == request.auth.token.email &&
+        incoming().role == 'student' &&
+        incoming().applicationStage == 'Profile Submitted' &&
+        incoming().passportStatus == 'missing' &&
+        incoming().transcriptsStatus == 'missing' &&
+        incoming().englishTestStatus == 'missing' &&
+        incoming().sopStatus == 'missing' &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow update: if isValidId(studentId) &&
+        isValidStudent(incoming()) &&
+        incoming().uid == existing().uid &&
+        incoming().role == existing().role &&
+        incoming().email == existing().email &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          (isAdmin() &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'applicationStage',
+              'assignedCounselor',
+              'passportStatus',
+              'passportFileName',
+              'transcriptsStatus',
+              'transcriptsFileName',
+              'englishTestStatus',
+              'englishTestFileName',
+              'sopStatus',
+              'sopFileName',
+              'updatedAt'
+            ])
+          ) ||
+          (isVerifiedUser() &&
+            request.auth.uid == studentId &&
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'fullName',
+              'phone',
+              'preferredDestination',
+              'academicLevel',
+              'passportStatus',
+              'passportFileName',
+              'transcriptsStatus',
+              'transcriptsFileName',
+              'englishTestStatus',
+              'englishTestFileName',
+              'sopStatus',
+              'sopFileName',
+              'updatedAt'
+            ]) &&
+            isStudentDocUpdateAllowed(incoming().passportStatus, existing().passportStatus, incoming().passportFileName, existing().passportFileName) &&
+            isStudentDocUpdateAllowed(incoming().transcriptsStatus, existing().transcriptsStatus, incoming().transcriptsFileName, existing().transcriptsFileName) &&
+            isStudentDocUpdateAllowed(incoming().englishTestStatus, existing().englishTestStatus, incoming().englishTestFileName, existing().englishTestFileName) &&
+            isStudentDocUpdateAllowed(incoming().sopStatus, existing().sopStatus, incoming().sopFileName, existing().sopFileName)
+          )
+        );
+      allow delete: if isValidId(studentId) && isAdmin();
+    }
+
+    // Internal counselor notes: strictly admin-only (isolated from students)
+    match /studentNotes/{studentId} {
+      allow get: if isValidId(studentId) && isAdmin();
+      allow list: if isAdmin();
+      allow create: if isValidId(studentId) &&
+        isAdmin() &&
+        isValidStudentNote(incoming()) &&
+        incoming().studentId == studentId &&
+        incoming().updatedAt == request.time;
+      allow update: if isValidId(studentId) &&
+        isAdmin() &&
+        isValidStudentNote(incoming()) &&
+        incoming().studentId == existing().studentId &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['notes', 'updatedBy', 'updatedAt']);
+      allow delete: if isValidId(studentId) && isAdmin();
     }
   }
 }

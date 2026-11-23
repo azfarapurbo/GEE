@@ -99,7 +99,7 @@
     },
     "AdminUser": {
       "title": "AdminUser",
-      "description": "Authorized education consultancy staff member allowed to review bookings.",
+      "description": "Authorized education consultancy staff member allowed to review bookings and students.",
       "type": "object",
       "properties": {
         "uid": {
@@ -125,6 +125,194 @@
         }
       },
       "required": ["uid", "email", "role", "createdAt"]
+    },
+    "StudentProfile": {
+      "title": "StudentProfile",
+      "description": "Registered student portal profile, application tracker stage, and document checklist statuses.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Firebase Auth UID."
+        },
+        "role": {
+          "type": "string",
+          "enum": ["student"],
+          "description": "Immutable student role."
+        },
+        "fullName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100,
+          "description": "Student full name."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 5,
+          "maxLength": 120,
+          "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+          "description": "Student email address."
+        },
+        "phone": {
+          "type": "string",
+          "minLength": 7,
+          "maxLength": 30,
+          "pattern": "^\\+?[0-9\\s\\-()]{7,30}$",
+          "description": "Student phone or WhatsApp number."
+        },
+        "preferredDestination": {
+          "type": "string",
+          "enum": [
+            "USA",
+            "Canada",
+            "UK",
+            "Europe/Schengen",
+            "Australia",
+            "Malaysia"
+          ],
+          "description": "Preferred study destination."
+        },
+        "academicLevel": {
+          "type": "string",
+          "enum": [
+            "Foundation/Diploma",
+            "Bachelor's",
+            "Master's/MBA",
+            "MBBS/Healthcare",
+            "Ph.D."
+          ],
+          "description": "Target academic program level."
+        },
+        "applicationStage": {
+          "type": "string",
+          "enum": [
+            "Profile Submitted",
+            "Document Review",
+            "University Applied",
+            "Offer Letter",
+            "Visa Processing",
+            "Visa Approved"
+          ],
+          "description": "Current application tracking stage."
+        },
+        "assignedCounselor": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120,
+          "description": "Assigned GEE counselor name and desk."
+        },
+        "passportStatus": {
+          "type": "string",
+          "enum": ["missing", "uploaded", "verified"],
+          "description": "Passport submission and verification state."
+        },
+        "passportFileName": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 140,
+          "description": "Submitted passport document filename."
+        },
+        "transcriptsStatus": {
+          "type": "string",
+          "enum": ["missing", "uploaded", "verified"],
+          "description": "Academic transcripts submission and verification state."
+        },
+        "transcriptsFileName": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 140,
+          "description": "Submitted academic transcripts filename."
+        },
+        "englishTestStatus": {
+          "type": "string",
+          "enum": ["missing", "uploaded", "verified"],
+          "description": "IELTS/SAT score report submission and verification state."
+        },
+        "englishTestFileName": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 140,
+          "description": "Submitted IELTS/SAT score report filename."
+        },
+        "sopStatus": {
+          "type": "string",
+          "enum": ["missing", "uploaded", "verified"],
+          "description": "Statement of Purpose submission and verification state."
+        },
+        "sopFileName": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 140,
+          "description": "Submitted Statement of Purpose filename."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last update timestamp."
+        }
+      },
+      "required": [
+        "uid",
+        "role",
+        "fullName",
+        "email",
+        "phone",
+        "preferredDestination",
+        "academicLevel",
+        "applicationStage",
+        "assignedCounselor",
+        "passportStatus",
+        "passportFileName",
+        "transcriptsStatus",
+        "transcriptsFileName",
+        "englishTestStatus",
+        "englishTestFileName",
+        "sopStatus",
+        "sopFileName",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "StudentNote": {
+      "title": "StudentNote",
+      "description": "Internal counselor-only notes for a registered student, strictly isolated from student read access.",
+      "type": "object",
+      "properties": {
+        "studentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Matching student UID."
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 2000,
+          "description": "Internal counselor remarks."
+        },
+        "updatedBy": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 120,
+          "description": "Admin email who saved the note."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last update timestamp."
+        }
+      },
+      "required": ["studentId", "notes", "updatedBy", "updatedAt"]
     }
   },
   "firestore": {
@@ -135,6 +323,14 @@
     "/admins/{adminId}": {
       "schema": { "$ref": "#/entities/AdminUser" },
       "description": "Authorized consultancy administrators for Admin Dashboard access."
+    },
+    "/students/{studentId}": {
+      "schema": { "$ref": "#/entities/StudentProfile" },
+      "description": "Student portal application profiles, stage tracking, and document statuses."
+    },
+    "/studentNotes/{studentId}": {
+      "schema": { "$ref": "#/entities/StudentNote" },
+      "description": "Admin-only internal counselor notes isolated from student PII reads."
     }
   }
 }
