@@ -309,7 +309,7 @@ export function HomePage({ onNavigate, onSelectDestination }: HomePageProps) {
               </h1>
 
               <p className="mt-5 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
-                From university shortlisting, IELTS preparation, and merit scholarships to embassy visa approval, Global Education Expert (GEE) guides international students every step of the way.
+                From university shortlisting, IELTS preparation, and merit scholarships to embassy visa approval, Global Education Expert (GEX) guides international students every step of the way.
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -866,7 +866,7 @@ export function HomePage({ onNavigate, onSelectDestination }: HomePageProps) {
                 Start Your Application
               </p>
               <h2 className="mt-2 font-display text-2xl font-bold tracking-tight text-white [text-wrap:balance] sm:text-3xl">
-                Speak directly with a GEE counselor for your 2026 or 2027 intake.
+                Speak directly with a GEX counselor for your 2026 or 2027 intake.
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-slate-300">
                 Submit your academic details for a tailored university shortlist, scholarship eligibility audit, and transparent student visa roadmap.

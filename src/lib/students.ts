@@ -72,7 +72,7 @@ export interface CreateStudentInput {
   academicLevel: PortalAcademicLevel;
 }
 
-const PENDING_CACHE_PREFIX = 'gee_pending_student_';
+const PENDING_CACHE_PREFIX = 'gex_pending_student_';
 
 export function savePendingStudentDraft(profile: StudentProfileRecord): void {
   try {

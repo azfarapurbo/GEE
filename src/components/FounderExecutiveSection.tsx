@@ -68,7 +68,7 @@ const KEY_PLACEMENTS = [
 ];
 
 const VENTURE_ECOSYSTEM = [
-  { id: 'gee', label: 'Global Education Expert' },
+  { id: 'gex', label: 'Global Education Expert' },
   { id: 'seg', label: 'Sunshine Education Group' },
   { id: 'sebwa', label: 'SEBWA (Western Australia Curriculum)' },
   { id: 'ysi', label: 'YSI Bangla & BePro Ed-Tech', count: '15,000+' },

@@ -161,7 +161,7 @@ export function AssessmentFormCard() {
           >
             {CONSULTATION_EMAIL}
           </a>
-          . A senior GEE counselor will reach out within 24–48 hours.
+          . A senior GEX counselor will reach out within 24–48 hours.
         </p>
 
         <div className="mt-5 rounded-xl border border-white/10 bg-[#0B1120]/70 px-4 py-3">

@@ -203,7 +203,7 @@
           "type": "string",
           "minLength": 2,
           "maxLength": 120,
-          "description": "Assigned GEE counselor name and desk."
+          "description": "Assigned GEX counselor name and desk."
         },
         "passportStatus": {
           "type": "string",

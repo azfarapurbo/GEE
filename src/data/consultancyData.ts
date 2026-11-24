@@ -202,9 +202,9 @@ export const COMPANY_CONTACT = {
     {
       name: 'Chittagong Office',
       addressLines: [
-        'Epic Emdad Heights, Chattoshawri Circle',
-        'Mehedibag (EBL Building), Flat B-8 (Left Side)',
-        'Chittagong, Bangladesh',
+        'House 11, Road 1',
+        'Nasirabad Housing Society',
+        'Chattogram',
       ],
       phoneDisplay: '+880 1717149453',
       phoneHref: 'tel:+8801717149453',
@@ -1156,7 +1156,7 @@ export const CONSULTANCY_TEAM: ConsultantProfile[] = [
     name: 'Chittagong Advisory Desk',
     role: 'Headquarters · Admissions & Visa Compliance',
     specialization: 'UK, Europe, Canada, USA & Medical Pathways',
-    experience: 'Epic Emdad Heights, Mehedibag, Chittagong',
+    experience: 'House 11, Road 1, Nasirabad Housing Society, Chattogram',
     languages: 'English, Bengali',
     bio: 'Handles complete profile assessments, university offer processing, scholarship applications, and embassy visa file preparation for students nationwide.',
   },

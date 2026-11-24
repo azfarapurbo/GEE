@@ -212,7 +212,7 @@ export function ConsultationPage() {
                       <div>
                         <dt className="font-semibold text-white">Chittagong Office</dt>
                         <dd className="mt-0.5 text-slate-300">
-                          Epic Emdad Heights, Chattoshawri Circle, Mehedibag (EBL Building), Flat B-8 (Left Side), Chittagong
+                          House 11, Road 1, Nasirabad Housing Society, Chattogram
                         </dd>
                       </div>
                       <div>

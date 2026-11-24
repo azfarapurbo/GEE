@@ -37,7 +37,7 @@ export function Navbar({ currentPage, onNavigate }: NavbarProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0B1120]/60 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
-        {/* Zone 1: Official GEE Brand Logo + Wordmark */}
+        {/* Zone 1: Official GEX Brand Logo + Wordmark */}
         <a
           href="#home"
           onClick={(e) => {
